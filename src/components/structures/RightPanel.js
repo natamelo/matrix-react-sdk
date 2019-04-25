@@ -49,6 +49,7 @@ export default class RightPanel extends React.Component {
         GroupRoomInfo: 'GroupRoomInfo',
         FilePanel: 'FilePanel',
         NotificationPanel: 'NotificationPanel',
+        SolicitationPanel: 'SolicitationPanel',
         RoomMemberInfo: 'RoomMemberInfo',
         GroupMemberInfo: 'GroupMemberInfo',
     });
@@ -163,6 +164,7 @@ export default class RightPanel extends React.Component {
         const MemberList = sdk.getComponent('rooms.MemberList');
         const MemberInfo = sdk.getComponent('rooms.MemberInfo');
         const NotificationPanel = sdk.getComponent('structures.NotificationPanel');
+        const SolicitationPanel = sdk.getComponent('structures.SolicitationPanel');
         const FilePanel = sdk.getComponent('structures.FilePanel');
 
         const GroupMemberList = sdk.getComponent('groups.GroupMemberList');
@@ -192,6 +194,8 @@ export default class RightPanel extends React.Component {
                 key={this.state.groupRoomId} />;
         } else if (this.state.phase === RightPanel.Phase.NotificationPanel) {
             panel = <NotificationPanel />;
+        } else if (this.state.phase === RightPanel.Phase.SolicitationPanel) {
+            panel = <SolicitationPanel roomId={this.props.roomId} />;
         } else if (this.state.phase === RightPanel.Phase.FilePanel) {
             panel = <FilePanel roomId={this.props.roomId} />;
         }

@@ -52,6 +52,12 @@ export default class RoomHeaderButtons extends HeaderButtons {
         ];
 
         return [
+            <HeaderButton key="solicitationsButton" name="solicitationsButton"
+            title={_t('Solicitations')}
+            isHighlighted={this.isPhase(RightPanel.Phase.SolicitationPanel)}
+            clickPhase={RightPanel.Phase.SolicitationPanel}
+            analytics={['Right Panel', 'Solicitation List Button', 'click']}
+            />,
             <HeaderButton key="membersButton" name="membersButton"
                 title={_t('Members')}
                 isHighlighted={this.isPhase(membersPhases)}

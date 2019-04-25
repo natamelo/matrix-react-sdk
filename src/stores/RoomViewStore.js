@@ -142,6 +142,7 @@ class RoomViewStore extends Store {
                 joining: payload.joining || false,
                 // Reset replyingToEvent because we don't want cross-room because bad UX
                 replyingToEvent: null,
+                checkSolicitation: null,
                 // pull the user out of Room Settings
                 isEditingSettings: false,
             };
@@ -319,6 +320,10 @@ class RoomViewStore extends Store {
     // The mxEvent if one is currently being replied to/quoted
     getQuotingEvent() {
         return this._state.replyingToEvent;
+    }
+
+    getCheckSolicitationEvent() {
+        return this._state.checkSolicitation;
     }
 
     shouldPeek() {

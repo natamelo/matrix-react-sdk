@@ -1118,7 +1118,11 @@ export default class MessageComposerInput extends React.Component {
         }
 
         const replyingToEv = RoomViewStore.getQuotingEvent();
+        //const checkingSolicitation = RoomViewStore.getCheckSolicitationEvent();
         const mustSendHTML = Boolean(replyingToEv);
+        //if (checkingSolicitation) {
+        //    mustSendHTML = Boolean(checkingSolicitation);
+        //}
 
         if (this.state.isRichTextEnabled) {
             // We should only send HTML if any block is styled or contains inline style
