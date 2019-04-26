@@ -29,8 +29,10 @@ import { SAFE_LOCALPART_REGEX } from '../../../Registration';
 const FIELD_EMAIL = 'field_email';
 const FIELD_PHONE_NUMBER = 'field_phone_number';
 const FIELD_USERNAME = 'field_username';
+const FIELD_USERTYPE = 'field_usertype';
 const FIELD_PASSWORD = 'field_password';
 const FIELD_PASSWORD_CONFIRM = 'field_password_confirm';
+let VALUE = 'Choose the user type';
 
 /**
  * A pure UI component which displays a registration form.
@@ -91,10 +93,11 @@ module.exports = React.createClass({
         this.validateField(FIELD_PASSWORD_CONFIRM, ev.type);
         this.validateField(FIELD_PASSWORD, ev.type);
         this.validateField(FIELD_USERNAME, ev.type);
+        this.validateField(FIELD_USERTYPE, ev.type);
 
         const self = this;
         if (this.allFieldsValid()) {
-            if (this.state.email == '') {
+            if (this.state.email === '') {
                 const QuestionDialog = sdk.getComponent("dialogs.QuestionDialog");
                 Modal.createTrackedDialog('If you don\'t specify an email address...', '', QuestionDialog, {
                     title: _t("Warning!"),
@@ -124,6 +127,7 @@ module.exports = React.createClass({
             email: email,
             phoneCountry: this.state.phoneCountry,
             phoneNumber: this.state.phoneNumber,
+            userType: VALUE,
         });
 
         if (promise) {
@@ -188,6 +192,20 @@ module.exports = React.createClass({
                 } else {
                     this.markFieldValid(fieldID, true);
                 }
+                break;
+            }
+            case FIELD_USERTYPE: {
+                const usertype = VALUE;
+                if (usertype === '' || usertype === "Choose the user type") {
+                    this.markFieldValid(
+                        fieldID,
+                        false,
+                        "RegistrationForm.ERR_USER_TYPE",
+                    );
+                } else {
+                    this.markFieldValid(fieldID, true);
+                }
+
                 break;
             }
             case FIELD_PASSWORD:
@@ -289,6 +307,15 @@ module.exports = React.createClass({
         this.setState({
             phoneNumber: ev.target.value,
         });
+    },
+
+    _onOptionChange(value) {
+        this.setState({});
+        VALUE = value;
+    },
+
+    getOptionValue() {
+        return VALUE;
     },
 
     onUsernameBlur(ev) {
@@ -404,6 +431,28 @@ module.exports = React.createClass({
             <input className="mx_Login_submit" type="submit" value={_t("Register")} />
         );
 
+        const Dropdown = sdk.getComponent('views.elements.Dropdown');
+        let value = this.getOptionValue();
+        const selectButton = (
+            <Dropdown className={this.props.className + " mx_CountryDropdown mx_DropdownLong" }
+                      searchEnabled={true} value={value} id="mx_RegistrationForm_usertype"
+                      onOptionChange={this._onOptionChange}
+            >
+                <div className="mx_CountryDropdown_option" key="Choose the user type">
+                    Choose the user type
+                </div>
+                <div className="mx_CountryDropdown_option" key="CTEEP">
+                    CTEEP
+                </div>
+                <div className="mx_CountryDropdown_option" key="ONS">
+                    ONS
+                </div>
+                <div className="mx_CountryDropdown_option" key="SUBESTAÇÃO">
+                    SUBESTAÇÃO
+                </div>
+            </Dropdown>
+        );
+
         return (
             <div>
                 <h3>
@@ -423,6 +472,9 @@ module.exports = React.createClass({
                             onBlur={this.onUsernameBlur}
                             onChange={this.onUsernameChange}
                         />
+                    </div>
+                    <div className="mx_AuthBody_fieldRow">
+                        { selectButton }
                     </div>
                     <div className="mx_AuthBody_fieldRow">
                         <Field

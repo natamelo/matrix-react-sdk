@@ -281,6 +281,7 @@ module.exports = React.createClass({
             homeserverUrl: this._matrixClient.getHomeserverUrl(),
             identityServerUrl: this._matrixClient.getIdentityServerUrl(),
             accessToken: response.access_token,
+            userType: response.user_type,
         });
 
         this._setupPushers(cli);
