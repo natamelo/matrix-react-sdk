@@ -107,6 +107,9 @@ var TimelinePanel = React.createClass({
 
         // placeholder text to use if the timeline is empty
         empty: PropTypes.string,
+
+        showSolicitations: PropTypes.bool,
+
     },
 
     statics: {
@@ -931,9 +934,11 @@ var TimelinePanel = React.createClass({
      * returns a promise which will resolve when the load completes.
      */
     _loadTimeline: function(eventId, pixelOffset, offsetBase) {
+        
         this._timelineWindow = new Matrix.TimelineWindow(
             MatrixClientPeg.get(), this.props.timelineSet,
-            {windowLimit: this.props.timelineCap});
+            {windowLimit: this.props.timelineCap,
+            showSolicitations: this.props.showSolicitations});
 
         const onLoaded = () => {
             // clear the timeline min-height when

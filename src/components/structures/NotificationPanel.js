@@ -37,6 +37,7 @@ const NotificationPanel = React.createClass({
         const Loader = sdk.getComponent("elements.Spinner");
 
         const timelineSet = MatrixClientPeg.get().getNotifTimelineSet();
+
         if (timelineSet) {
             return (
                 <TimelinePanel key={"NotificationPanel_" + this.props.roomId}
@@ -57,6 +58,7 @@ const NotificationPanel = React.createClass({
                 </div>
             );
         }
+
     },
 });
 

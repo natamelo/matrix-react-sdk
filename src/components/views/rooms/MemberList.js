@@ -211,6 +211,7 @@ module.exports = React.createClass({
             // work around a race where you might have a room member object
             // before the user object exists.  This may or may not cause
             // https://github.com/vector-im/vector-web/issues/186
+
             if (member.user === null) {
                 member.user = cli.getUser(member.userId);
             }
