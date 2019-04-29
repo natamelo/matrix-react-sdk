@@ -324,6 +324,9 @@ module.exports = React.createClass({
 
         let errMsg;
         switch (errCode) {
+            case "RegistrationForm.ERR_USER_TYPE":
+                errMsg = _t('You need to choose the user type');
+                break;
             case "RegistrationForm.ERR_PASSWORD_MISSING":
                 errMsg = _t('Missing password.');
                 break;

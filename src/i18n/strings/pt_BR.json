@@ -279,6 +279,7 @@
     "Set a display name:": "Defina um nome público para você:",
     "Upload an avatar:": "Envie uma imagem de perfil para identificar você:",
     "This server does not support authentication with a phone number.": "Este servidor não permite a autenticação através de números de telefone.",
+    "You need to choose the user type" : "Você deve escolher o tipo do usuário.",
     "Missing password.": "Faltou a senha.",
     "Passwords don't match.": "As senhas não conferem.",
     "Password too short (min %(MIN_PASSWORD_LENGTH)s).": "A senha é muito curta (o mínimo é de %(MIN_PASSWORD_LENGTH)s caracteres).",
