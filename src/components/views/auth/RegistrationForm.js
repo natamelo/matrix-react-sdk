@@ -127,7 +127,7 @@ module.exports = React.createClass({
             email: email,
             phoneCountry: this.state.phoneCountry,
             phoneNumber: this.state.phoneNumber,
-            userType: VALUE,
+            usertype: VALUE,
         });
 
         if (promise) {
@@ -446,9 +446,6 @@ module.exports = React.createClass({
                 </div>
                 <div className="mx_CountryDropdown_option" key="ONS">
                     ONS
-                </div>
-                <div className="mx_CountryDropdown_option" key="SUBESTAÇÃO">
-                    SUBESTAÇÃO
                 </div>
             </Dropdown>
         );

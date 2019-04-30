@@ -411,6 +411,7 @@ module.exports = React.createClass({
             undefined, // session id: included in the auth dict already
             auth,
             bindThreepids,
+            this.state.formVals.usertype,
             null,
         );
     },
