@@ -36,8 +36,8 @@ const SolicitationPanel = React.createClass({
 
         const TimelinePanel = sdk.getComponent("structures.TimelinePanel");
         const Loader = sdk.getComponent("elements.Spinner");
-        console.log
-        const timelineSet = MatrixClientPeg.get().getNotifTimelineSet();
+        
+        const timelineSet = MatrixClientPeg.get().getSolicitationTimelineSet();
 
         if (timelineSet) {
             return (
@@ -48,7 +48,7 @@ const SolicitationPanel = React.createClass({
                     timelineSet={timelineSet}
                     showUrlPreview = {false}
                     tileShape="solicitation"
-                    empty={_t('You have no visible solicitations')}
+                    empty={_t('You have no solicitations')}
                     showSolicitations = {true}
                 />
             );

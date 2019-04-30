@@ -197,6 +197,14 @@ class MatrixClientPeg {
         // XXX: what is our initial pagination token?! it somehow needs to be synchronised with /sync.
         notifTimelineSet.getLiveTimeline().setPaginationToken("", EventTimeline.BACKWARDS);
         this.matrixClient.setNotifTimelineSet(notifTimelineSet);
+
+        const solicitationTimelineSet = new EventTimelineSet(null, {
+            timelineSupport: true,
+        });
+        // XXX: what is our initial pagination token?! it somehow needs to be synchronised with /sync.
+        solicitationTimelineSet.getLiveTimeline().setPaginationToken("", EventTimeline.BACKWARDS);
+        this.matrixClient.setSolicitationTimelineSet(solicitationTimelineSet);
+
     }
 }
 

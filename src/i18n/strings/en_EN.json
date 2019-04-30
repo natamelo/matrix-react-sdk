@@ -1366,6 +1366,7 @@
     "Create a new community": "Create a new community",
     "Create a community to group together users and rooms! Build a custom homepage to mark out your space in the Matrix universe.": "Create a community to group together users and rooms! Build a custom homepage to mark out your space in the Matrix universe.",
     "You have no visible notifications": "You have no visible notifications",
+    "You have no solicitations": "You have no solicitations",
     "Failed to get protocol list from homeserver": "Failed to get protocol list from homeserver",
     "The homeserver may be too old to support third party networks": "The homeserver may be too old to support third party networks",
     "Failed to get public room list": "Failed to get public room list",

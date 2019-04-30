@@ -1166,7 +1166,6 @@ var TimelinePanel = React.createClass({
     render: function() {
         const MessagePanel = sdk.getComponent("structures.MessagePanel");
         const Loader = sdk.getComponent("elements.Spinner");
-
         // just show a spinner while the timeline loads.
         //
         // put it in a div of the right class (mx_RoomView_messagePanel) so
@@ -1210,6 +1209,7 @@ var TimelinePanel = React.createClass({
             this.state.forwardPaginating ||
             ['PREPARED', 'CATCHUP'].includes(this.state.clientSyncState)
         );
+        
         return (
             <MessagePanel ref="messagePanel"
                           room={this.props.timelineSet.room}
