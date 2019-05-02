@@ -652,7 +652,7 @@ module.exports = withMatrixClient(React.createClass({
             );    
         }     
         var status = null;
-        if (content.status != null) {
+        if (content.status) {
             status = <div> {content.status} </div>
         }
         
@@ -695,7 +695,6 @@ module.exports = withMatrixClient(React.createClass({
 
         switch (this.props.tileShape) {
             case 'notif': {
-                console.log("entrou na notificacao");
                 const EmojiText = sdk.getComponent('elements.EmojiText');
                 const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
                 return (
@@ -719,6 +718,37 @@ module.exports = withMatrixClient(React.createClass({
                                            highlightLink={this.props.highlightLink}
                                            showUrlPreview={this.props.showUrlPreview}
                                            onHeightChanged={this.props.onHeightChanged} />
+                        </div>
+                    </div>
+                );
+            }
+            case 'solicitation': {
+                const EmojiText = sdk.getComponent('elements.EmojiText');
+                const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
+                return (
+                    <div className={classes}>
+                        <div className="mx_EventTile_roomName">
+                            <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
+                                { room ? room.name : '' }
+                            </EmojiText>
+                        </div>
+                        <div className="mx_EventTile_senderDetails">
+                            { avatar }
+                            <a href={permalink} onClick={this.onPermalinkClicked}>
+                                { sender }
+                                { timestamp }
+                            </a>
+                        </div>
+                        <div className="mx_EventTile_line" >
+                            <EventTileType ref="tile"
+                                           mxEvent={this.props.mxEvent}
+                                           highlights={this.props.highlights}
+                                           highlightLink={this.props.highlightLink}
+                                           showUrlPreview={this.props.showUrlPreview}
+                                           onHeightChanged={this.props.onHeightChanged} />
+                        </div>
+                        <div className="mx_EventTile_line" >
+                        { status }
                         </div>
                     </div>
                 );
@@ -805,7 +835,6 @@ module.exports = withMatrixClient(React.createClass({
                                            highlightLink={this.props.highlightLink}
                                            showUrlPreview={this.props.showUrlPreview}
                                            onHeightChanged={this.props.onHeightChanged} />
-                            { status }
                             { keyRequestInfo }
                             { checkButton } 
                             { editButton }

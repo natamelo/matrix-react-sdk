@@ -110,6 +110,7 @@ var TimelinePanel = React.createClass({
 
         showSolicitations: PropTypes.bool,
 
+        roomId: PropTypes.string,
     },
 
     statics: {
@@ -938,9 +939,11 @@ var TimelinePanel = React.createClass({
         this._timelineWindow = new Matrix.TimelineWindow(
             MatrixClientPeg.get(), this.props.timelineSet,
             {windowLimit: this.props.timelineCap,
-            showSolicitations: this.props.showSolicitations});
+            showSolicitations: this.props.showSolicitations,
+            roomId: this.props.roomId,});
 
         const onLoaded = () => {
+            
             // clear the timeline min-height when
             // (re)loading the timeline
             if (this.refs.messagePanel) {

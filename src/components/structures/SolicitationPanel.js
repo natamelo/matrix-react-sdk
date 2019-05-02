@@ -17,6 +17,7 @@ limitations under the License.
 const React = require('react');
 const ReactDOM = require("react-dom");
 import { _t } from '../../languageHandler';
+import PropTypes from 'prop-types';
 const Matrix = require("matrix-js-sdk");
 const sdk = require('../../index');
 const MatrixClientPeg = require("../../MatrixClientPeg");
@@ -29,6 +30,8 @@ const SolicitationPanel = React.createClass({
     displayName: 'SolicitationPanel',
 
     propTypes: {
+        groupId: PropTypes.string,
+        roomId: PropTypes.string,
     },
 
     render: function() {
@@ -49,7 +52,8 @@ const SolicitationPanel = React.createClass({
                     showUrlPreview = {false}
                     tileShape="solicitation"
                     empty={_t('You have no solicitations')}
-                    showSolicitations = {true}
+                    showSolicitations={true}
+                    roomId={this.props.roomId} 
                 />
             );
         } else {
