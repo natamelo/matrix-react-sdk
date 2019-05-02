@@ -438,13 +438,13 @@ module.exports = React.createClass({
                       searchEnabled={true} value={value} id="mx_RegistrationForm_usertype"
                       onOptionChange={this._onOptionChange}
             >
-                <div className="mx_CountryDropdown_option" key="Selecione o tipo de usuário">
+                <div className="mx_TypeDropdown_option" key="Selecione o tipo de usuário">
                     Selecione o tipo de usuário
                 </div>
-                <div className="mx_CountryDropdown_option" key="CTEEP">
+                <div className="mx_TypeDropdown_option" key="CTEEP">
                     CTEEP
                 </div>
-                <div className="mx_CountryDropdown_option" key="ONS">
+                <div className="mx_TypeDropdown_option" key="ONS">
                     ONS
                 </div>
             </Dropdown>
@@ -499,10 +499,6 @@ module.exports = React.createClass({
                         { emailSection }
                         { phoneSection }
                     </div>
-                    {_t(
-                        "Use an email address to recover your account. Other users " +
-                        "can invite you to rooms using your contact details.",
-                    )}
                     { registerButton }
                 </form>
             </div>
