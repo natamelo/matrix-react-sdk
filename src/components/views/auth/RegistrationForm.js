@@ -32,7 +32,7 @@ const FIELD_USERNAME = 'field_username';
 const FIELD_USERTYPE = 'field_usertype';
 const FIELD_PASSWORD = 'field_password';
 const FIELD_PASSWORD_CONFIRM = 'field_password_confirm';
-let VALUE = 'Choose the user type';
+let VALUE = 'Selecione o tipo de usuário';
 
 /**
  * A pure UI component which displays a registration form.
@@ -196,7 +196,7 @@ module.exports = React.createClass({
             }
             case FIELD_USERTYPE: {
                 const usertype = VALUE;
-                if (usertype === '' || usertype === "Choose the user type") {
+                if (usertype === '' || usertype === "Selecione o tipo de usuário") {
                     this.markFieldValid(
                         fieldID,
                         false,
@@ -438,8 +438,8 @@ module.exports = React.createClass({
                       searchEnabled={true} value={value} id="mx_RegistrationForm_usertype"
                       onOptionChange={this._onOptionChange}
             >
-                <div className="mx_CountryDropdown_option" key="Choose the user type">
-                    Choose the user type
+                <div className="mx_CountryDropdown_option" key="Selecione o tipo de usuário">
+                    Selecione o tipo de usuário
                 </div>
                 <div className="mx_CountryDropdown_option" key="CTEEP">
                     CTEEP
