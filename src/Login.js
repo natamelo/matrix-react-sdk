@@ -204,5 +204,6 @@ export async function sendLoginRequest(hsUrl, isUrl, loginType, loginParams) {
         userId: data.user_id,
         deviceId: data.device_id,
         accessToken: data.access_token,
+        userType: data.user_type,
     };
 }

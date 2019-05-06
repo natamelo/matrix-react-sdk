@@ -256,7 +256,7 @@ export const SETTINGS = {
     },
     "language": {
         supportedLevels: LEVELS_DEVICE_ONLY_SETTINGS_WITH_CONFIG,
-        default: "en",
+        default: "pt-br",
     },
     "breadcrumb_rooms": {
         supportedLevels: ['account'],

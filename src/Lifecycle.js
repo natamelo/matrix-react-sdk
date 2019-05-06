@@ -234,8 +234,9 @@ function _getLocalStorageSessionVars() {
     const accessToken = localStorage.getItem("mx_access_token");
     const userId = localStorage.getItem("mx_user_id");
     const deviceId = localStorage.getItem("mx_device_id");
+    const userType = localStorage.getItem("mx_user_type");
 
-    return {hsUrl, isUrl, accessToken, userId, deviceId};
+    return {hsUrl, isUrl, accessToken, userId, deviceId, userType};
 }
 
 // returns a promise which resolves to true if a session is found in
@@ -253,7 +254,7 @@ async function _restoreFromLocalStorage() {
         return false;
     }
 
-    const {hsUrl, isUrl, accessToken, userId, deviceId} = _getLocalStorageSessionVars();
+    const {hsUrl, isUrl, accessToken, userId, deviceId, userType} = _getLocalStorageSessionVars();
 
     let isGuest;
     if (localStorage.getItem("mx_is_guest") !== null) {
@@ -272,6 +273,7 @@ async function _restoreFromLocalStorage() {
             homeserverUrl: hsUrl,
             identityServerUrl: isUrl,
             guest: isGuest,
+            userType: userType,
         }, false);
         return true;
     } else {
@@ -338,6 +340,7 @@ async function _doSetLoggedIn(credentials, clearStorage) {
 
     console.log(
         "setLoggedIn: mxid: " + credentials.userId +
+        " userType: " + credentials.userType +
         " deviceId: " + credentials.deviceId +
         " guest: " + credentials.guest +
         " hs: " + credentials.homeserverUrl,
@@ -357,6 +360,7 @@ async function _doSetLoggedIn(credentials, clearStorage) {
     }
 
     const results = await StorageManager.checkConsistency();
+    console.log("RESULTS IN DO LOG", results);
     // If there's an inconsistency between account data in local storage and the
     // crypto store, we'll be generally confused when handling encrypted data.
     // Show a modal recommending a full reset of storage.
@@ -419,6 +423,7 @@ function _persistCredentialsToLocalStorage(credentials) {
     localStorage.setItem("mx_hs_url", credentials.homeserverUrl);
     localStorage.setItem("mx_is_url", credentials.identityServerUrl);
     localStorage.setItem("mx_user_id", credentials.userId);
+    localStorage.setItem("mx_user_type", credentials.userType);
     localStorage.setItem("mx_access_token", credentials.accessToken);
     localStorage.setItem("mx_is_guest", JSON.stringify(credentials.guest));
 

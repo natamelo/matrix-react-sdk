@@ -21,19 +21,8 @@ import PlatformPeg from "../../../PlatformPeg";
 import sdk from '../../../index';
 import React from 'react';
 
-function onChange(newLang) {
-    if (getCurrentLanguage() !== newLang) {
-        SettingsStore.setValue("language", null, SettingLevel.DEVICE, newLang);
-        PlatformPeg.get().reload();
-    }
-}
 
 export default function LanguageSelector() {
-    if (SdkConfig.get()['disable_login_language_selector']) return <div />;
-
-    const LanguageDropdown = sdk.getComponent('views.elements.LanguageDropdown');
-    return <LanguageDropdown className="mx_AuthBody_language"
-        onOptionChange={onChange}
-        value={getCurrentLanguage()}
-    />;
+    //SettingsStore.setValue("language", null, SettingLevel.DEVICE, 'pt-br');
+    return <div />;
 }

@@ -281,6 +281,7 @@ module.exports = React.createClass({
             homeserverUrl: this._matrixClient.getHomeserverUrl(),
             identityServerUrl: this._matrixClient.getIdentityServerUrl(),
             accessToken: response.access_token,
+            userType: response.user_type,
         });
 
         this._setupPushers(cli);
@@ -323,6 +324,9 @@ module.exports = React.createClass({
 
         let errMsg;
         switch (errCode) {
+            case "RegistrationForm.ERR_USER_TYPE":
+                errMsg = _t('You need to choose the user type');
+                break;
             case "RegistrationForm.ERR_PASSWORD_MISSING":
                 errMsg = _t('Missing password.');
                 break;
@@ -407,6 +411,7 @@ module.exports = React.createClass({
             undefined, // session id: included in the auth dict already
             auth,
             bindThreepids,
+            this.state.formVals.usertype,
             null,
         );
     },

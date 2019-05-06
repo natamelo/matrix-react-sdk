@@ -91,7 +91,8 @@ export class TopLeftMenu extends React.Component {
         return <div className="mx_TopLeftMenu">
             <div className="mx_TopLeftMenu_section_noIcon">
                 <div>{this.props.displayName}</div>
-                <div className="mx_TopLeftMenu_greyedText">{this.props.userId}</div>
+                <div className="mx_TopLeftMenu_greyedText">{this.props.userId }</div>
+                <div className="mx_TopLeftMenu_greyedText">{this.getUserType()}</div>
                 {hostingSignup}
             </div>
             {homePageSection}
@@ -124,5 +125,13 @@ export class TopLeftMenu extends React.Component {
 
     closeMenu() {
         if (this.props.onFinished) this.props.onFinished();
+    }
+
+    getUserType() {
+        const userType = localStorage.getItem('mx_user_type');
+        if (userType === 'cteep') return 'CTEEP';
+        else if (userType === 'ons') return 'ONS';
+        else if (userType === 'subestacao') return 'SUBESTAÇÃO';
+        else return this.props.userType = "";
     }
 }

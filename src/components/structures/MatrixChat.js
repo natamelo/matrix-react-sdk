@@ -393,7 +393,7 @@ export default React.createClass({
         }).then((loadedSession) => {
             if (!loadedSession) {
                 // fall back to showing the welcome screen
-                dis.dispatch({action: "view_welcome_page"});
+                dis.dispatch({action: "start_login"});
             }
         });
         // Note we don't catch errors from this: we catch everything within
@@ -908,7 +908,7 @@ export default React.createClass({
 
     _viewWelcome() {
         this.setStateForNewView({
-            view: VIEWS.WELCOME,
+            view: VIEWS.LOGIN,
         });
         this.notifyNewScreen('welcome');
     },
@@ -1243,7 +1243,7 @@ export default React.createClass({
             });
         } else {
             if (MatrixClientPeg.get().isGuest()) {
-                dis.dispatch({action: 'view_welcome_page'});
+                dis.dispatch({action: 'start_login'});
             } else if (getHomePageUrl(this.props.config)) {
                 dis.dispatch({action: 'view_home_page'});
             } else {
@@ -1552,7 +1552,7 @@ export default React.createClass({
             });
         } else if (screen == 'welcome') {
             dis.dispatch({
-                action: 'view_welcome_page',
+                action: 'start_login',
             });
         } else if (screen == 'home') {
             dis.dispatch({

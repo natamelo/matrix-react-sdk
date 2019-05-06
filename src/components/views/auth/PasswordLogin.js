@@ -243,46 +243,6 @@ class PasswordLogin extends React.Component {
     render() {
         const Field = sdk.getComponent('elements.Field');
 
-        let forgotPasswordJsx;
-
-        if (this.props.onForgotPasswordClick) {
-            forgotPasswordJsx = <span>
-                {_t('Not sure of your password? <a>Set a new one</a>', {}, {
-                    a: sub => <a className="mx_Login_forgot"
-                        onClick={this.onForgotPasswordClick}
-                        href="#"
-                    >
-                        {sub}
-                    </a>,
-                })}
-            </span>;
-        }
-
-        let signInToText = _t('Sign in to your Matrix account');
-        if (this.props.hsName) {
-            signInToText = _t('Sign in to your Matrix account on %(serverName)s', {
-                serverName: this.props.hsName,
-            });
-        } else {
-            try {
-                const parsedHsUrl = new URL(this.props.hsUrl);
-                signInToText = _t('Sign in to your Matrix account on %(serverName)s', {
-                    serverName: parsedHsUrl.hostname,
-                });
-            } catch (e) {
-                // ignore
-            }
-        }
-
-        let editLink = null;
-        if (this.props.onEditServerDetailsClick) {
-            editLink = <a className="mx_AuthBody_editServerDetails"
-                href="#" onClick={this.props.onEditServerDetailsClick}
-            >
-                {_t('Change')}
-            </a>;
-        }
-
         const pwFieldClass = classNames({
             error: this.props.loginIncorrect && !this.isLoginEmpty(), // only error password if error isn't top field
         });
@@ -326,11 +286,8 @@ class PasswordLogin extends React.Component {
 
         return (
             <div>
-                <h3>
-                    {signInToText}
-                    {editLink}
-                </h3>
                 <form onSubmit={this.onSubmitForm}>
+                    <br />
                     {loginType}
                     {loginField}
                     <Field
@@ -342,7 +299,6 @@ class PasswordLogin extends React.Component {
                         value={this.state.password}
                         onChange={this.onPasswordChanged}
                     />
-                    {forgotPasswordJsx}
                     <input className="mx_Login_submit"
                         type="submit"
                         value={_t('Sign in')}
