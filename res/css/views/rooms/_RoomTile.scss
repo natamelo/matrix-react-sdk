@@ -109,6 +109,14 @@ limitations under the License.
     text-overflow: ellipsis;
 }
 
+.mx_RoomTitle_Padding {
+    padding-left: 30px;
+}
+
+.mx_RoomTile_Desc_Padding {
+    padding-top: 4px;
+}
+
 .collapsed {
     .mx_RoomTile {
         margin: 0 2px;
