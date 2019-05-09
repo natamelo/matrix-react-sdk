@@ -107,6 +107,10 @@ var TimelinePanel = React.createClass({
 
         // placeholder text to use if the timeline is empty
         empty: PropTypes.string,
+
+        showSolicitations: PropTypes.bool,
+
+        roomId: PropTypes.string,
     },
 
     statics: {
@@ -931,11 +935,15 @@ var TimelinePanel = React.createClass({
      * returns a promise which will resolve when the load completes.
      */
     _loadTimeline: function(eventId, pixelOffset, offsetBase) {
+        
         this._timelineWindow = new Matrix.TimelineWindow(
             MatrixClientPeg.get(), this.props.timelineSet,
-            {windowLimit: this.props.timelineCap});
+            {windowLimit: this.props.timelineCap,
+            showSolicitations: this.props.showSolicitations,
+            roomId: this.props.roomId,});
 
         const onLoaded = () => {
+            
             // clear the timeline min-height when
             // (re)loading the timeline
             if (this.refs.messagePanel) {
@@ -1161,7 +1169,6 @@ var TimelinePanel = React.createClass({
     render: function() {
         const MessagePanel = sdk.getComponent("structures.MessagePanel");
         const Loader = sdk.getComponent("elements.Spinner");
-
         // just show a spinner while the timeline loads.
         //
         // put it in a div of the right class (mx_RoomView_messagePanel) so
@@ -1205,6 +1212,7 @@ var TimelinePanel = React.createClass({
             this.state.forwardPaginating ||
             ['PREPARED', 'CATCHUP'].includes(this.state.clientSyncState)
         );
+        
         return (
             <MessagePanel ref="messagePanel"
                           room={this.props.timelineSet.room}

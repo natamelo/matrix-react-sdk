@@ -17,49 +17,54 @@ limitations under the License.
 const React = require('react');
 const ReactDOM = require("react-dom");
 import { _t } from '../../languageHandler';
+import PropTypes from 'prop-types';
 const Matrix = require("matrix-js-sdk");
 const sdk = require('../../index');
 const MatrixClientPeg = require("../../MatrixClientPeg");
 const dis = require("../../dispatcher");
 
 /*
- * Component which shows the global notification list using a TimelinePanel
+ * Component which shows the solicitations
  */
-const NotificationPanel = React.createClass({
-    displayName: 'NotificationPanel',
+const SolicitationPanel = React.createClass({
+    displayName: 'SolicitationPanel',
 
     propTypes: {
+        groupId: PropTypes.string,
+        roomId: PropTypes.string,
     },
 
     render: function() {
         // wrap a TimelinePanel with the jump-to-event bits turned off.
+
         const TimelinePanel = sdk.getComponent("structures.TimelinePanel");
         const Loader = sdk.getComponent("elements.Spinner");
-
-        const timelineSet = MatrixClientPeg.get().getNotifTimelineSet();
+        
+        const timelineSet = MatrixClientPeg.get().getSolicitationTimelineSet();
 
         if (timelineSet) {
             return (
-                <TimelinePanel key={"NotificationPanel_" + this.props.roomId}
+                <TimelinePanel key={"SolicitationPanel_" + this.props.roomId}
                     className="mx_NotificationPanel"
                     manageReadReceipts={false}
                     manageReadMarkers={false}
                     timelineSet={timelineSet}
                     showUrlPreview = {false}
-                    tileShape="notif"
-                    empty={_t('You have no visible notifications')}
+                    tileShape="solicitation"
+                    empty={_t('You have no solicitations')}
+                    showSolicitations={true}
+                    roomId={this.props.roomId} 
                 />
             );
         } else {
-            console.error("No notifTimelineSet available!");
+            console.error("No solicitationTimelineSet available!");
             return (
-                <div className="mx_NotificationPanel">
+                <div className="mx_SolicitationPanel">
                     <Loader />
                 </div>
             );
         }
-
     },
 });
 
-module.exports = NotificationPanel;
+module.exports = SolicitationPanel;

@@ -49,6 +49,7 @@ export default class RightPanel extends React.Component {
         GroupRoomInfo: 'GroupRoomInfo',
         FilePanel: 'FilePanel',
         NotificationPanel: 'NotificationPanel',
+        SolicitationPanel: 'SolicitationPanel',
         RoomMemberInfo: 'RoomMemberInfo',
         Room3pidMemberInfo: 'Room3pidMemberInfo',
         GroupMemberInfo: 'GroupMemberInfo',
@@ -166,6 +167,7 @@ export default class RightPanel extends React.Component {
         const MemberInfo = sdk.getComponent('rooms.MemberInfo');
         const ThirdPartyMemberInfo = sdk.getComponent('rooms.ThirdPartyMemberInfo');
         const NotificationPanel = sdk.getComponent('structures.NotificationPanel');
+        const SolicitationPanel = sdk.getComponent('structures.SolicitationPanel');
         const FilePanel = sdk.getComponent('structures.FilePanel');
 
         const GroupMemberList = sdk.getComponent('groups.GroupMemberList');
@@ -192,11 +194,15 @@ export default class RightPanel extends React.Component {
                 key={this.state.member.user_id} />;
         } else if (this.state.phase === RightPanel.Phase.GroupRoomInfo) {
             panel = <GroupRoomInfo
-                groupRoomId={this.state.groupRoomId}
+                roomId={this.props.roomId}
                 groupId={this.props.groupId}
                 key={this.state.groupRoomId} />;
         } else if (this.state.phase === RightPanel.Phase.NotificationPanel) {
             panel = <NotificationPanel />;
+        } else if (this.state.phase === RightPanel.Phase.SolicitationPanel) {
+            panel = <SolicitationPanel                 
+                roomId={this.props.roomId}
+                groupId={this.props.groupId} />;
         } else if (this.state.phase === RightPanel.Phase.FilePanel) {
             panel = <FilePanel roomId={this.props.roomId} resizeNotifier={this.props.resizeNotifier} />;
         }

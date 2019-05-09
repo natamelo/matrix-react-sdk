@@ -528,7 +528,7 @@ export function bodyToHtml(content, highlights, opts={}) {
         'mx_EventTile_bigEmoji': emojiBody,
         'markdown-body': isHtmlMessage,
     });
-
+    
     return isDisplayedWithHtml ?
         <span className={className} dangerouslySetInnerHTML={{ __html: safeBody }} dir="auto" /> :
         <span className={className} dir="auto">{ strippedBody }</span>;
