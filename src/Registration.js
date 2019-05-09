@@ -76,7 +76,7 @@ export async function startAnyRegistrationFlow(options) {
                 } else if (options.go_home_on_cancel) {
                     dis.dispatch({action: 'view_home_page'});
                 } else if (options.go_welcome_on_cancel) {
-                    dis.dispatch({action: 'view_welcome_page'});
+                    dis.dispatch({action: 'start_login'});
                 }
             },
         });

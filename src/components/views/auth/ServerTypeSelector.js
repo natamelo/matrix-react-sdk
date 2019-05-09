@@ -137,8 +137,10 @@ export default class ServerTypeSelector extends React.PureComponent {
             </div>);
         }
 
-        return <div className="mx_ServerTypeSelector">
-            {serverTypes}
-        </div>;
+        // return <div className="mx_ServerTypeSelector">
+        //     {serverTypes}
+        // </div>;
+
+        return <div></div>;
     }
 }

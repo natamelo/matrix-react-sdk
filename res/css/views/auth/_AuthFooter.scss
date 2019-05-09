@@ -15,17 +15,7 @@ limitations under the License.
 */
 
 .mx_AuthFooter {
-    text-align: center;
-    width: 100%;
-    font-size: 14px;
-    opacity: 0.72;
-    padding: 20px 0;
-    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));
+    display: none;
 }
 
-.mx_AuthFooter a:link,
-.mx_AuthFooter a:hover,
-.mx_AuthFooter a:visited {
-    color: $accent-fg-color;
-    margin: 0 22px;
-}
+

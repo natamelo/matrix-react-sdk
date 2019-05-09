@@ -18,6 +18,10 @@ limitations under the License.
     padding: 0 3px;
 }
 
+.mx_DropdownLong {
+    width: 100%;
+}
+
 .mx_CountryDropdown .mx_Dropdown_arrow {
     padding-right: 3px;
 }
@@ -31,4 +35,11 @@ limitations under the License.
 .mx_CountryDropdown_option {
     display: flex;
     align-items: center;
+}
+
+.mx_TypeDropdown_option {
+    display: flex;
+    align-items: center;
+    padding-left: 9px;
+    font-size: 14px;
 }
