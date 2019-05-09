@@ -55,7 +55,7 @@ export default class CountryDropdown extends React.Component {
             // If no value is given, we start with the first
             // country selected, but our parent component
             // doesn't know this, therefore we do this.
-            this.props.onOptionChange(COUNTRIES[0]);
+            this.props.onOptionChange(COUNTRIES[32]);
         }
     }
 

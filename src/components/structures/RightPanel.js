@@ -51,6 +51,7 @@ export default class RightPanel extends React.Component {
         NotificationPanel: 'NotificationPanel',
         SolicitationPanel: 'SolicitationPanel',
         RoomMemberInfo: 'RoomMemberInfo',
+        Room3pidMemberInfo: 'Room3pidMemberInfo',
         GroupMemberInfo: 'GroupMemberInfo',
     });
 
@@ -156,6 +157,7 @@ export default class RightPanel extends React.Component {
                 groupRoomId: payload.groupRoomId,
                 groupId: payload.groupId,
                 member: payload.member,
+                event: payload.event,
             });
         }
     }
@@ -163,6 +165,7 @@ export default class RightPanel extends React.Component {
     render() {
         const MemberList = sdk.getComponent('rooms.MemberList');
         const MemberInfo = sdk.getComponent('rooms.MemberInfo');
+        const ThirdPartyMemberInfo = sdk.getComponent('rooms.ThirdPartyMemberInfo');
         const NotificationPanel = sdk.getComponent('structures.NotificationPanel');
         const SolicitationPanel = sdk.getComponent('structures.SolicitationPanel');
         const FilePanel = sdk.getComponent('structures.FilePanel');
@@ -182,6 +185,8 @@ export default class RightPanel extends React.Component {
             panel = <GroupRoomList groupId={this.props.groupId} key={this.props.groupId} />;
         } else if (this.state.phase === RightPanel.Phase.RoomMemberInfo) {
             panel = <MemberInfo member={this.state.member} key={this.props.roomId || this.state.member.userId} />;
+        } else if (this.state.phase === RightPanel.Phase.Room3pidMemberInfo) {
+            panel = <ThirdPartyMemberInfo event={this.state.event} key={this.props.roomId} />;
         } else if (this.state.phase === RightPanel.Phase.GroupMemberInfo) {
             panel = <GroupMemberInfo
                 groupMember={this.state.member}
@@ -199,7 +204,7 @@ export default class RightPanel extends React.Component {
                 roomId={this.props.roomId}
                 groupId={this.props.groupId} />;
         } else if (this.state.phase === RightPanel.Phase.FilePanel) {
-            panel = <FilePanel roomId={this.props.roomId} />;
+            panel = <FilePanel roomId={this.props.roomId} resizeNotifier={this.props.resizeNotifier} />;
         }
 
         const classes = classNames("mx_RightPanel", "mx_fadable", {

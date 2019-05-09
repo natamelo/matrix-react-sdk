@@ -31,7 +31,8 @@ import Modal from './Modal';
 import sdk from './index';
 import ActiveWidgetStore from './stores/ActiveWidgetStore';
 import PlatformPeg from "./PlatformPeg";
-import {sendLoginRequest} from "./Login";
+import { sendLoginRequest } from "./Login";
+import * as StorageManager from './utils/StorageManager';
 
 /**
  * Called at startup, to attempt to build a logged-in Matrix session. It tries
@@ -102,9 +103,14 @@ export async function loadSession(opts) {
             return _registerAsGuest(guestHsUrl, guestIsUrl, defaultDeviceDisplayName);
         }
 
-        // fall back to login screen
+        // fall back to welcome screen
         return false;
     } catch (e) {
+        if (e instanceof AbortLoginAndRebuildStorage) {
+            // If we're aborting login because of a storage inconsistency, we don't
+            // need to show the general failure dialog. Instead, just go back to welcome.
+            return false;
+        }
         return _handleLoadSessionFailure(e);
     }
 }
@@ -197,9 +203,6 @@ export function handleInvalidStoreError(e) {
 function _registerAsGuest(hsUrl, isUrl, defaultDeviceDisplayName) {
     console.log(`Doing guest login on ${hsUrl}`);
 
-    // TODO: we should probably de-duplicate this and Login.loginAsGuest.
-    // Not really sure where the right home for it is.
-
     // create a temporary MatrixClient to do the login
     const client = Matrix.createClient({
         baseUrl: hsUrl,
@@ -231,8 +234,9 @@ function _getLocalStorageSessionVars() {
     const accessToken = localStorage.getItem("mx_access_token");
     const userId = localStorage.getItem("mx_user_id");
     const deviceId = localStorage.getItem("mx_device_id");
+    const userType = localStorage.getItem("mx_user_type");
 
-    return {hsUrl, isUrl, accessToken, userId, deviceId};
+    return {hsUrl, isUrl, accessToken, userId, deviceId, userType};
 }
 
 // returns a promise which resolves to true if a session is found in
@@ -250,7 +254,7 @@ async function _restoreFromLocalStorage() {
         return false;
     }
 
-    const {hsUrl, isUrl, accessToken, userId, deviceId} = _getLocalStorageSessionVars();
+    const {hsUrl, isUrl, accessToken, userId, deviceId, userType} = _getLocalStorageSessionVars();
 
     let isGuest;
     if (localStorage.getItem("mx_is_guest") !== null) {
@@ -269,6 +273,7 @@ async function _restoreFromLocalStorage() {
             homeserverUrl: hsUrl,
             identityServerUrl: isUrl,
             guest: isGuest,
+            userType: userType,
         }, false);
         return true;
     } else {
@@ -278,7 +283,7 @@ async function _restoreFromLocalStorage() {
 }
 
 function _handleLoadSessionFailure(e) {
-    console.log("Unable to load session", e);
+    console.error("Unable to load session", e);
 
     const def = Promise.defer();
     const SessionRestoreErrorDialog =
@@ -335,6 +340,7 @@ async function _doSetLoggedIn(credentials, clearStorage) {
 
     console.log(
         "setLoggedIn: mxid: " + credentials.userId +
+        " userType: " + credentials.userType +
         " deviceId: " + credentials.deviceId +
         " guest: " + credentials.guest +
         " hs: " + credentials.homeserverUrl,
@@ -351,6 +357,23 @@ async function _doSetLoggedIn(credentials, clearStorage) {
 
     if (clearStorage) {
         await _clearStorage();
+    }
+
+    const results = await StorageManager.checkConsistency();
+    console.log("RESULTS IN DO LOG", results);
+    // If there's an inconsistency between account data in local storage and the
+    // crypto store, we'll be generally confused when handling encrypted data.
+    // Show a modal recommending a full reset of storage.
+    if (results.dataInLocalStorage && !results.dataInCryptoStore) {
+        const signOut = await _showStorageEvictedDialog();
+        if (signOut) {
+            await _clearStorage();
+            // This error feels a bit clunky, but we want to make sure we don't go any
+            // further and instead head back to sign in.
+            throw new AbortLoginAndRebuildStorage(
+                "Aborting login in progress because of storage inconsistency",
+            );
+        }
     }
 
     Analytics.setLoggedIn(credentials.guest, credentials.homeserverUrl, credentials.identityServerUrl);
@@ -383,10 +406,24 @@ async function _doSetLoggedIn(credentials, clearStorage) {
     return MatrixClientPeg.get();
 }
 
+function _showStorageEvictedDialog() {
+    const StorageEvictedDialog = sdk.getComponent('views.dialogs.StorageEvictedDialog');
+    return new Promise(resolve => {
+        Modal.createTrackedDialog('Storage evicted', '', StorageEvictedDialog, {
+            onFinished: resolve,
+        });
+    });
+}
+
+// Note: Babel 6 requires the `transform-builtin-extend` plugin for this to satisfy
+// `instanceof`. Babel 7 supports this natively in their class handling.
+class AbortLoginAndRebuildStorage extends Error { }
+
 function _persistCredentialsToLocalStorage(credentials) {
     localStorage.setItem("mx_hs_url", credentials.homeserverUrl);
     localStorage.setItem("mx_is_url", credentials.identityServerUrl);
     localStorage.setItem("mx_user_id", credentials.userId);
+    localStorage.setItem("mx_user_type", credentials.userType);
     localStorage.setItem("mx_access_token", credentials.accessToken);
     localStorage.setItem("mx_is_guest", JSON.stringify(credentials.guest));
 
