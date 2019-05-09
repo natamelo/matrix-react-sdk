@@ -76,6 +76,10 @@ limitations under the License.
     mask-image: url('$(res)/img/feather-customised/notifications.svg');
 }
 
+.mx_RightPanel_solicitationsButton::before {
+    mask-image: url('$(res)/img/feather-customised/solicitations.svg');
+}
+
 .mx_RightPanel_groupMembersButton::before {
     mask-image: url('$(res)/img/icons-people.svg');
 }

@@ -33,6 +33,38 @@ import LazyRenderList from "../views/elements/LazyRenderList";
 // turn this on for drop & drag console debugging galore
 const debug = false;
 
+const audioPromises = {};
+
+function play(audioId) {
+    // TODO: Attach an invisible element for this instead
+    // which listens?
+    const audio = document.getElementById(audioId);
+    if (audio) {
+        if (audioPromises[audioId]) {
+            audioPromises[audioId] = audioPromises[audioId].then(()=>{
+                audio.load();
+                return audio.play();
+            });
+        } else {
+            audioPromises[audioId] = audio.play();
+        }
+    }
+}
+
+function pause(audioId) {
+    // TODO: Attach an invisible element for this instead
+    // which listens?
+    const audio = document.getElementById(audioId);
+    if (audio) {
+        if (audioPromises[audioId]) {
+            audioPromises[audioId] = audioPromises[audioId].then(()=>audio.pause());
+        } else {
+            // pause doesn't actually return a promise, but might as well do this for symmetry with play();
+            audioPromises[audioId] = audio.pause();
+        }
+    }
+}
+
 const RoomSubList = React.createClass({
     displayName: 'RoomSubList',
 
@@ -56,6 +88,18 @@ const RoomSubList = React.createClass({
         isFiltered: PropTypes.bool,
         headerItems: PropTypes.node, // content shown in the sublist header
         extraTiles: PropTypes.arrayOf(PropTypes.node), // extra elements added beneath tiles
+    },
+
+    __setPlayOrPauseRing: function() {
+        const subListNotifications = !this.props.isInvite ?
+        RoomNotifs.aggregateNotificationCount(this.props.list) : 
+        {count: 0, highlight: true};
+        const subListNotifCount = subListNotifications.count;
+        if (subListNotifCount > 0) {
+            play("ringAudio");
+        } else {
+            pause("ringAudio");
+        }
     },
 
     getInitialState: function() {
@@ -108,6 +152,7 @@ const RoomSubList = React.createClass({
         ) {
             this.forceUpdate();
         }
+        this.__setPlayOrPauseRing();
     },
 
     onClick: function(ev) {

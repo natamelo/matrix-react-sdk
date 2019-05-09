@@ -219,6 +219,24 @@ limitations under the License.
     width: auto;
 }
 
+.mx_EventTile_checkButton {
+    position: absolute;
+    display: inline-block;
+    visibility: hidden;
+    cursor: pointer;
+    top: 6px;
+    right: 30px;
+    width: 140px;
+    height: 19px;
+    border-radius: 10px;
+    background-color:#FFA500;
+    text-align:center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .mx_EventTile_editButton {
     position: absolute;
     display: inline-block;
@@ -233,6 +251,7 @@ limitations under the License.
 }
 
 .mx_EventTile:hover .mx_EventTile_editButton,
+.mx_EventTile_checkButton, 
 .mx_EventTile.menu .mx_EventTile_editButton {
     visibility: visible;
 }
@@ -551,7 +570,7 @@ limitations under the License.
         top: 3px;
     }
 
-    .mx_EventTile_editButton {
+    .mx_EventTile_editButton, .mx_EventTile_checkButton {
         top: 3px;
     }
 
