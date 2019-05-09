@@ -211,7 +211,6 @@ module.exports = withMatrixClient(React.createClass({
         if (!ObjectUtils.shallowEqual(this.state, nextState)) {
             return true;
         }
-
         return !this._propsEqual(this.props, nextProps);
     },
 
@@ -290,7 +289,21 @@ module.exports = withMatrixClient(React.createClass({
                         return false;
                     }
                 }
-            } else {
+            }  else if (key === 'mxEvent') {
+                
+                const rA = objA[key];
+                const rB = objB[key];
+
+                if (!rA || !rB) {
+                    return false;
+                }
+
+                if (rA && rB && rA.event && rB.event && 
+                    rA.event.content && rB.event.content && 
+                    rB.event.content.status === 'CIENTE') {
+                    return false;
+                }
+            }  else {
                 if (objA[key] !== objB[key]) {
                     return false;
                 }
@@ -646,7 +659,18 @@ module.exports = withMatrixClient(React.createClass({
             isSolicitation = content.body.includes("Solicitação");
         }
 
-        if ((this.props.tileShape == null || (this.props.tileShape != null && !this.props.tileShape.includes("solicitation")) && this.props.matrixClient.credentials.userId != this.props.mxEvent.getSender()) && isSolicitation) {
+        if ((this.props.tileShape == null || 
+            (this.props.tileShape != null && !this.props.tileShape.includes("solicitation")) && 
+                this.props.matrixClient.credentials.userId != this.props.mxEvent.getSender()) && 
+                isSolicitation && 
+                (this.props.mxEvent && this.props.mxEvent.event &&
+                    (this.props.mxEvent.event.content && 
+                        (this.props.mxEvent.event.content.status == null || 
+                            this.props.mxEvent.event.content.status === 'ABERTO'
+                        )
+                    )
+                )
+            ) {
             checkButton = (
                 <span className="mx_EventTile_checkButton" onClick={this.onCheckClicked}>  {_t("Check")} </span>
             );    

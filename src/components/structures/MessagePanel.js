@@ -242,7 +242,6 @@ module.exports = React.createClass({
 
     // TODO: Implement granular (per-room) hide options
     _shouldShowEvent: function(mxEv) {
-        
         if (mxEv.sender && MatrixClientPeg.get().isUserIgnored(mxEv.sender.userId)) {
             return false; // ignored = no show (only happens if the ignore happens after an event was received)
         }

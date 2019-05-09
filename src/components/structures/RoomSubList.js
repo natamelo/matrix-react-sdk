@@ -96,9 +96,9 @@ const RoomSubList = React.createClass({
         {count: 0, highlight: true};
         const subListNotifCount = subListNotifications.count;
         if (subListNotifCount > 0) {
-            play("ringAudio");
+            //play("ringAudio");
         } else {
-            pause("ringAudio");
+            //pause("ringAudio");
         }
     },
 

@@ -207,6 +207,7 @@ var TimelinePanel = React.createClass({
 
         this.dispatcherRef = dis.register(this.onAction);
         MatrixClientPeg.get().on("Room.timeline", this.onRoomTimeline);
+        MatrixClientPeg.get().on("Room.timelineUpdate", this.onTimeLineUpdateEvent);
         MatrixClientPeg.get().on("Room.timelineReset", this.onRoomTimelineReset);
         MatrixClientPeg.get().on("Room.redaction", this.onRoomRedaction);
         MatrixClientPeg.get().on("Room.receipt", this.onRoomReceipt);
@@ -219,6 +220,7 @@ var TimelinePanel = React.createClass({
     },
 
     componentWillReceiveProps: function(newProps) {
+        
         if (newProps.timelineSet !== this.props.timelineSet) {
             // throw new Error("changing timelineSet on a TimelinePanel is not supported");
 
@@ -261,7 +263,7 @@ var TimelinePanel = React.createClass({
             }
             return true;
         }
-
+        // Tratar isso aqui quando mudar o status - original: false
         return false;
     },
 
@@ -285,6 +287,7 @@ var TimelinePanel = React.createClass({
         const client = MatrixClientPeg.get();
         if (client) {
             client.removeListener("Room.timeline", this.onRoomTimeline);
+            client.removeListener("Room.timelineUpdate", this.onTimeLineUpdateEvent);
             client.removeListener("Room.timelineReset", this.onRoomTimelineReset);
             client.removeListener("Room.redaction", this.onRoomRedaction);
             client.removeListener("Room.receipt", this.onRoomReceipt);
@@ -409,6 +412,12 @@ var TimelinePanel = React.createClass({
         }
     },
 
+    onTimeLineUpdateEvent: function() {
+        this._reloadEvents();
+        
+        console.log("onTimeLineUpdateEvent! ");
+    },
+
     onRoomTimeline: function(ev, room, toStartOfTimeline, removed, data) {
         // ignore events for other timeline sets
         if (data.timeline.getTimelineSet() !== this.props.timelineSet) return;
@@ -517,7 +526,7 @@ var TimelinePanel = React.createClass({
 
     onLocalEchoUpdated: function(ev, room, oldEventId) {
         if (this.unmounted) return;
-
+        
         // ignore events for other rooms
         if (room !== this.props.timelineSet.room) return;
 
