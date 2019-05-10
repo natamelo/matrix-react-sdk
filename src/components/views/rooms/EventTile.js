@@ -641,16 +641,20 @@ module.exports = withMatrixClient(React.createClass({
         var checkButton = null;
         
         var isSolicitation = false
-        //console.log(">> " + str(content.body));
+        
         if (content != null && content.body != null && !("m.relates_to" in content)) {
             isSolicitation = content.body.includes("Solicitação");
         }
 
-        if (this.props.matrixClient.credentials.userId != this.props.mxEvent.getSender() && isSolicitation) {
+        if ((this.props.tileShape == null || (this.props.tileShape != null && !this.props.tileShape.includes("solicitation")) && this.props.matrixClient.credentials.userId != this.props.mxEvent.getSender()) && isSolicitation) {
             checkButton = (
                 <span className="mx_EventTile_checkButton" onClick={this.onCheckClicked}>  {_t("Check")} </span>
             );    
-        }        
+        }     
+        var status = null;
+        if (content.status) {
+            status = <div> {content.status} </div>
+        }
         
         const timestamp = this.props.mxEvent.getTs() ?
             <MessageTimestamp showTwelveHour={this.props.isTwelveHour} ts={this.props.mxEvent.getTs()} /> : null;
@@ -714,6 +718,37 @@ module.exports = withMatrixClient(React.createClass({
                                            highlightLink={this.props.highlightLink}
                                            showUrlPreview={this.props.showUrlPreview}
                                            onHeightChanged={this.props.onHeightChanged} />
+                        </div>
+                    </div>
+                );
+            }
+            case 'solicitation': {
+                const EmojiText = sdk.getComponent('elements.EmojiText');
+                const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
+                return (
+                    <div className={classes}>
+                        <div className="mx_EventTile_roomName">
+                            <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
+                                { room ? room.name : '' }
+                            </EmojiText>
+                        </div>
+                        <div className="mx_EventTile_senderDetails">
+                            { avatar }
+                            <a href={permalink} onClick={this.onPermalinkClicked}>
+                                { sender }
+                                { timestamp }
+                            </a>
+                        </div>
+                        <div className="mx_EventTile_line" >
+                            <EventTileType ref="tile"
+                                           mxEvent={this.props.mxEvent}
+                                           highlights={this.props.highlights}
+                                           highlightLink={this.props.highlightLink}
+                                           showUrlPreview={this.props.showUrlPreview}
+                                           onHeightChanged={this.props.onHeightChanged} />
+                        </div>
+                        <div className="mx_EventTile_line" >
+                        { status }
                         </div>
                     </div>
                 );

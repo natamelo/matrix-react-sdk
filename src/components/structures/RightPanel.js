@@ -194,13 +194,15 @@ export default class RightPanel extends React.Component {
                 key={this.state.member.user_id} />;
         } else if (this.state.phase === RightPanel.Phase.GroupRoomInfo) {
             panel = <GroupRoomInfo
-                groupRoomId={this.state.groupRoomId}
+                roomId={this.props.roomId}
                 groupId={this.props.groupId}
                 key={this.state.groupRoomId} />;
         } else if (this.state.phase === RightPanel.Phase.NotificationPanel) {
             panel = <NotificationPanel />;
         } else if (this.state.phase === RightPanel.Phase.SolicitationPanel) {
-            panel = <SolicitationPanel roomId={this.props.roomId} />;
+            panel = <SolicitationPanel                 
+                roomId={this.props.roomId}
+                groupId={this.props.groupId} />;
         } else if (this.state.phase === RightPanel.Phase.FilePanel) {
             panel = <FilePanel roomId={this.props.roomId} resizeNotifier={this.props.resizeNotifier} />;
         }
