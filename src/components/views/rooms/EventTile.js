@@ -300,7 +300,7 @@ module.exports = withMatrixClient(React.createClass({
 
                 if (rA && rB && rA.event && rB.event && 
                     rA.event.content && rB.event.content && 
-                    rB.event.content.status === 'CIENTE') {
+                    rB.event.content.status === 'Ciente') {
                     return false;
                 }
             }  else {
@@ -655,17 +655,19 @@ module.exports = withMatrixClient(React.createClass({
         
         const isSolicitation = content && content.open_solicitation;
         const shouldShowInTimeLine = !this.props.tileShape || !this.props.tileShape.includes("solicitation");
-        const userType = localStorage.getItem('mx_user_type') === 'cteep';
-        
-        if (shouldShowInTimeLine && isSolicitation && userType) {
+        const isCteepUser = localStorage.getItem('mx_user_type') === 'cteep';
+
+        if (shouldShowInTimeLine && isSolicitation && isCteepUser) {
             checkButton = (
                 <span className="mx_EventTile_checkButton" onClick={this.onCheckClicked}>  {_t("Check")} </span>
             );    
         }     
 
         var status = null;
-        if (content.status) {
-            status = <div> {content.status} </div>
+        if (content.status === 'Ciente') {
+            status = <div className="mx_EventTile_Checked"> {content.status} </div>
+        } else {
+            status = <div className="mx_EventTile_Requested"> {content.status} </div>    
         }
         
         const timestamp = this.props.mxEvent.getTs() ?
@@ -848,8 +850,8 @@ module.exports = withMatrixClient(React.createClass({
                                            showUrlPreview={this.props.showUrlPreview}
                                            onHeightChanged={this.props.onHeightChanged} />
                             { keyRequestInfo }
-                            { checkButton } 
                             { editButton }
+                            { checkButton } 
                         </div>
                         {
                             // The avatar goes after the event tile as it's absolutly positioned to be over the
