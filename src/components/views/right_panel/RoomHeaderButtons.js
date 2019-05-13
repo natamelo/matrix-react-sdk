@@ -35,6 +35,7 @@ export default class RoomHeaderButtons extends HeaderButtons {
         this._onMembersClicked = this._onMembersClicked.bind(this);
         this._onFilesClicked = this._onFilesClicked.bind(this);
         this._onNotificationsClicked = this._onNotificationsClicked.bind(this);
+        this._onSolicitationsClicked = this._onSolicitationsClicked.bind(this);
     }
 
     onAction(payload) {
@@ -68,13 +69,17 @@ export default class RoomHeaderButtons extends HeaderButtons {
         this.togglePhase(RightPanel.Phase.NotificationPanel);
     }
 
+    _onSolicitationsClicked() {
+        this.togglePhase(RightPanel.Phase.SolicitationPanel);
+    }
+
     renderButtons() {
         return [
             <HeaderButton key="solicitationsButton" name="solicitationsButton"
-            title={_t('Solicitations')}
-            isHighlighted={this.isPhase(RightPanel.Phase.SolicitationPanel)}
-            clickPhase={RightPanel.Phase.SolicitationPanel}
-            analytics={['Right Panel', 'Solicitation List Button', 'click']}
+                title={_t('Solicitations')}
+                isHighlighted={this.isPhase(RightPanel.Phase.SolicitationPanel)}
+                onClick={this._onSolicitationsClicked}
+                analytics={['Right Panel', 'Solicitation List Button', 'click']}
             />,
             <HeaderButton key="membersButton" name="membersButton"
                 title={_t('Members')}
