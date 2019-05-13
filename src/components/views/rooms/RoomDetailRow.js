@@ -93,24 +93,25 @@ export default React.createClass({
         </div>) : <div />;
 
         return <tr key={room.roomId} onClick={this.onClick} onMouseDown={this.props.onMouseDown}>
-            <td className="mx_RoomDirectory_roomAvatar">
+            <td className="mx_RoomTile_avatar mx_RoomTitle_Padding">
                 <BaseAvatar width={24} height={24} resizeMethod='crop'
                     name={name} idName={name}
                     url={ContentRepo.getHttpUriForMxc(
                             MatrixClientPeg.get().getHomeserverUrl(),
                             room.avatarUrl, 24, 24, "crop")} />
             </td>
-            <td className="mx_RoomDirectory_roomDescription">
-                <div className="mx_RoomDirectory_name">{ name }</div>&nbsp;
-                { perms }
-                <div className="mx_RoomDirectory_topic" ref="topic" onClick={this.onTopicClick}>
-                    { room.topic }
-                </div>
-                <div className="mx_RoomDirectory_alias">{ getDisplayAliasForRoom(room) }</div>
+            <td className="">
+                <div className="mx_RoomTile_name">{ name }</div>
+                {/*&nbsp;*/}
+                {/*{ perms }*/}
+                {/*<div className="mx_RoomDirectory_topic" ref="topic" onClick={this.onTopicClick}>*/}
+                {/*    { room.topic }*/}
+                {/*</div>*/}
+                {/*<div className="mx_RoomDirectory_alias">{ getDisplayAliasForRoom(room) }</div>*/}
             </td>
-            <td className="mx_RoomDirectory_roomMemberCount">
-                { room.numJoinedMembers }
-            </td>
+            {/*<td className="mx_RoomDirectory_roomMemberCount">*/}
+            {/*    { room.numJoinedMembers }*/}
+            {/*</td>*/}
         </tr>;
     },
 });
