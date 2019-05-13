@@ -653,28 +653,16 @@ module.exports = withMatrixClient(React.createClass({
 
         var checkButton = null;
         
-        var isSolicitation = false
+        const isSolicitation = content && content.open_solicitation;
+        const shouldShowInTimeLine = !this.props.tileShape || !this.props.tileShape.includes("solicitation");
+        const userType = localStorage.getItem('mx_user_type') === 'cteep';
         
-        if (content != null && content.body != null && !("m.relates_to" in content)) {
-            isSolicitation = content.body.includes("Solicitação");
-        }
-
-        if ((this.props.tileShape == null || 
-            (this.props.tileShape != null && !this.props.tileShape.includes("solicitation")) && 
-                this.props.matrixClient.credentials.userId != this.props.mxEvent.getSender()) && 
-                isSolicitation && 
-                (this.props.mxEvent && this.props.mxEvent.event &&
-                    (this.props.mxEvent.event.content && 
-                        (this.props.mxEvent.event.content.status == null || 
-                            this.props.mxEvent.event.content.status === 'ABERTO'
-                        )
-                    )
-                )
-            ) {
+        if (shouldShowInTimeLine && isSolicitation && userType) {
             checkButton = (
                 <span className="mx_EventTile_checkButton" onClick={this.onCheckClicked}>  {_t("Check")} </span>
             );    
         }     
+
         var status = null;
         if (content.status) {
             status = <div> {content.status} </div>
