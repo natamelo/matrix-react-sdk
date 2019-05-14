@@ -1807,7 +1807,7 @@ export default React.createClass({
     },
 
     _setPageSubtitle: function(subtitle='') {
-        document.title = `${SdkConfig.get().brand || 'Riot'} ${subtitle}`;
+        document.title = 'ZapCot';
     },
 
     updateStatusIndicator: function(state, prevState) {
