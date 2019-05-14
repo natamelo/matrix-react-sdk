@@ -604,6 +604,9 @@ module.exports = withMatrixClient(React.createClass({
         if (this.props.tileShape === "notif") {
             avatarSize = 24;
             needsSenderProfile = true;
+        } else if (this.props.tileShape === "solicitation") {
+            avatarSize = 16;
+            needsSenderProfile = true;
         } else if (tileHandler === 'messages.RoomCreate') {
             avatarSize = 0;
             needsSenderProfile = false;

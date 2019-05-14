@@ -73,13 +73,14 @@ export default class RightPanel extends React.Component {
     }
 
     _getPhaseFromProps() {
-        if (this.props.groupId) {
+        /*if (this.props.groupId) {
             return RightPanel.Phase.GroupMemberList;
         } else if (this.props.user) {
             return RightPanel.Phase.RoomMemberInfo;
         } else {
             return RightPanel.Phase.RoomMemberList;
-        }
+        }*/
+        return RightPanel.Phase.SolicitationPanel;
     }
 
     componentWillMount() {

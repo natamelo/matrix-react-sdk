@@ -282,7 +282,7 @@ const LeftPanel = React.createClass({
         return groupNodes;
     },
 
-    render: function() {
+    /*render: function() {
         const TopLeftMenuButton = sdk.getComponent('structures.TopLeftMenuButton');
         const CallPreview = sdk.getComponent('voip.CallPreview');
 
@@ -308,70 +308,69 @@ const LeftPanel = React.createClass({
                 </aside>
             </div>
         );
-    },
+    },*/
 
     // OLD RENDER FUNC
-    // render: function() {
-    //     const RoomList = sdk.getComponent('rooms.RoomList');
-    //     const RoomBreadcrumbs = sdk.getComponent('rooms.RoomBreadcrumbs');
-    //     const TagPanel = sdk.getComponent('structures.TagPanel');
-    //     const CustomRoomTagPanel = sdk.getComponent('structures.CustomRoomTagPanel');
-    //     const TopLeftMenuButton = sdk.getComponent('structures.TopLeftMenuButton');
-    //     const SearchBox = sdk.getComponent('structures.SearchBox');
-    //     const CallPreview = sdk.getComponent('voip.CallPreview');
-    //
-    //     const tagPanelEnabled = SettingsStore.getValue("TagPanel.enableTagPanel");
-    //     let tagPanelContainer;
-    //
-    //     const isCustomTagsEnabled = SettingsStore.isFeatureEnabled("feature_custom_tags");
-    //
-    //     if (tagPanelEnabled) {
-    //         tagPanelContainer = (<div className="mx_LeftPanel_tagPanelContainer">
-    //             <TagPanel />
-    //             { isCustomTagsEnabled ? <CustomRoomTagPanel /> : undefined }
-    //             <TagPanelButtons />
-    //         </div>);
-    //     }
-    //
-    //     const containerClasses = classNames(
-    //         "mx_LeftPanel_container", "mx_fadable",
-    //         {
-    //             "collapsed": this.props.collapsed,
-    //             "mx_LeftPanel_container_hasTagPanel": tagPanelEnabled,
-    //             "mx_fadable_faded": this.props.disabled,
-    //         },
-    //     );
-    //
-    //     const searchBox = (<SearchBox
-    //         enableRoomSearchFocus={true}
-    //         placeholder={ _t('Filter room names') }
-    //         onSearch={ this.onSearch }
-    //         onCleared={ this.onSearchCleared }
-    //         collapsed={this.props.collapsed} />);
-    //
-    //     let breadcrumbs;
-    //     if (this.state.breadcrumbs) {
-    //         breadcrumbs = (<RoomBreadcrumbs collapsed={this.props.collapsed} />);
-    //     }
-    //
-    //     return (
-    //         <div className={containerClasses}>
-    //             { tagPanelContainer }
-    //             <aside className={"mx_LeftPanel dark-panel"} onKeyDown={ this._onKeyDown } onFocus={ this._onFocus } onBlur={ this._onBlur }>
-    //                 <TopLeftMenuButton collapsed={ this.props.collapsed } />
-    //                 { breadcrumbs }
-    //                 { searchBox }
-    //                 <CallPreview ConferenceHandler={VectorConferenceHandler} />
-    //                 <RoomList
-    //                     ref={this.collectRoomList}
-    //                     resizeNotifier={this.props.resizeNotifier}
-    //                     collapsed={this.props.collapsed}
-    //                     searchFilter={this.state.searchFilter}
-    //                     ConferenceHandler={VectorConferenceHandler} />
-    //             </aside>
-    //         </div>
-    //     );
-    // },
+     render: function() {
+         const RoomList = sdk.getComponent('rooms.RoomList');
+         const RoomBreadcrumbs = sdk.getComponent('rooms.RoomBreadcrumbs');
+         const TagPanel = sdk.getComponent('structures.TagPanel');
+         const CustomRoomTagPanel = sdk.getComponent('structures.CustomRoomTagPanel');
+         const TopLeftMenuButton = sdk.getComponent('structures.TopLeftMenuButton');
+         const SearchBox = sdk.getComponent('structures.SearchBox');
+         const CallPreview = sdk.getComponent('voip.CallPreview');
+    
+         const tagPanelEnabled = SettingsStore.getValue("TagPanel.enableTagPanel");
+         let tagPanelContainer;
+    
+         const isCustomTagsEnabled = SettingsStore.isFeatureEnabled("feature_custom_tags");
+    
+         if (tagPanelEnabled) {
+             tagPanelContainer = (<div className="mx_LeftPanel_tagPanelContainer">
+                 <TagPanel />
+                 { isCustomTagsEnabled ? <CustomRoomTagPanel /> : undefined }
+                 <TagPanelButtons />
+             </div>);
+         }
+    
+         const containerClasses = classNames(
+             "mx_LeftPanel_container", "mx_fadable",
+             {
+                 "collapsed": this.props.collapsed,
+                 "mx_LeftPanel_container_hasTagPanel": tagPanelEnabled,
+                 "mx_fadable_faded": this.props.disabled,
+             },
+         );
+    
+         const searchBox = (<SearchBox
+             enableRoomSearchFocus={true}
+             placeholder={ _t('Filter room names') }
+             onSearch={ this.onSearch }
+             onCleared={ this.onSearchCleared }
+             collapsed={this.props.collapsed} />);
+    
+         let breadcrumbs;
+         if (this.state.breadcrumbs) {
+             breadcrumbs = (<RoomBreadcrumbs collapsed={this.props.collapsed} />);
+         }
+            //{ tagPanelContainer }
+         return (
+             <div className={containerClasses}>
+                 <aside className={"mx_LeftPanel dark-panel"} onKeyDown={ this._onKeyDown } onFocus={ this._onFocus } onBlur={ this._onBlur }>
+                     <TopLeftMenuButton collapsed={ this.props.collapsed } />
+                     { breadcrumbs }
+                     { searchBox }
+                     <CallPreview ConferenceHandler={VectorConferenceHandler} />
+                     <RoomList
+                         ref={this.collectRoomList}
+                         resizeNotifier={this.props.resizeNotifier}
+                         collapsed={this.props.collapsed}
+                         searchFilter={this.state.searchFilter}
+                         ConferenceHandler={VectorConferenceHandler} />
+                 </aside>
+             </div>
+         );
+     },
 });
 
 module.exports = LeftPanel;
