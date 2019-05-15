@@ -31,7 +31,7 @@ const MEMBER_PHASES = [
 
 export default class RoomHeaderButtons extends HeaderButtons {
     constructor(props) {
-        super(props, RightPanel.Phase.SolicitationPanel);
+        super(props, RightPanel.Phase.RoomMemberList);
         this._onMembersClicked = this._onMembersClicked.bind(this);
         this._onFilesClicked = this._onFilesClicked.bind(this);
         this._onNotificationsClicked = this._onNotificationsClicked.bind(this);
@@ -44,15 +44,15 @@ export default class RoomHeaderButtons extends HeaderButtons {
             if (payload.member) {
                 this.setPhase(RightPanel.Phase.RoomMemberInfo, {member: payload.member});
             } else {
-                //this.setPhase(RightPanel.Phase.RoomMemberList);
+                this.setPhase(RightPanel.Phase.RoomMemberList);
             }
         } else if (payload.action === "view_room" && !this.props.collapsedRhs) {
-            //this.setPhase(RightPanel.Phase.RoomMemberList);
+            this.setPhase(RightPanel.Phase.RoomMemberList);
         } else if (payload.action === "view_3pid_invite") {
             if (payload.event) {
                 this.setPhase(RightPanel.Phase.Room3pidMemberInfo, {event: payload.event});
             } else {
-                //this.setPhase(RightPanel.Phase.RoomMemberList);
+                this.setPhase(RightPanel.Phase.RoomMemberList);
             }
         }
     }
