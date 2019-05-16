@@ -33,6 +33,10 @@ limitations under the License.
     flex: 0 0 140px;
 }
 
+.disabled {
+    display: none;
+}
+
 .mx_LeftPanel_tagPanelContainer {
     flex: 0 0 70px;
     height: 100%;
