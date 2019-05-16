@@ -36,6 +36,7 @@ import FlairStore from '../../stores/FlairStore';
 import { showGroupAddRoomDialog } from '../../GroupAddressPicker';
 import {makeGroupPermalink, makeUserPermalink} from "../../matrix-to";
 import {Group} from "matrix-js-sdk";
+import Unread from "../../Unread";
 
 const LONG_DESC_PLACEHOLDER = _td(
     `<h1>HTML for your community's page</h1>
@@ -811,23 +812,58 @@ export default React.createClass({
     },
 
     _getGroupSection: function() {
+        const roomNodes = this._getRoomsNode();
         return <div>
-            { this._getRoomsNode() }
+            { roomNodes }
         </div>;
     },
 
     _getRoomsNode: function() {
-        const RoomDetailList = sdk.getComponent('rooms.RoomDetailList');
+        const client = MatrixClientPeg.get();
 
-        const roomDetailListClassName = classnames({
-            "mx_fadable": true,
-            "mx_fadable_faded": this.state.editing,
-        });
-        return (
-                <RoomDetailList
-                    rooms={this.state.groupRooms}
-                    className={roomDetailListClassName} />
-        );
+        const RoomTile = sdk.getComponent("rooms.RoomTile");
+
+        const tiles = [];
+        for (const room of this.state.groupRooms) {
+            const roomId = JSON.stringify(room.roomId);
+            console.log('ROOM STATE', roomId);
+            console.log('ROOM CLIENT', client.getRoom(roomId));
+            // if (room) {
+            //     const myMembership = room.getMyMembership();
+            //     // not a DM room if we have are not joined
+            //     if (myMembership !== 'join') continue;
+            //
+            //     const them = this.props.member;
+            //     // not a DM room if they are not joined
+            //     if (!them.membership || them.membership !== 'join') continue;
+            //
+            //     const highlight = room.getUnreadNotificationCount('highlight') > 0;
+            //
+            //     tiles.push(
+            //         <RoomTile key={room.roomId} room={room}
+            //                   transparent={true}
+            //                   collapsed={false}
+            //                   selected={false}
+            //                   unread={Unread.doesRoomHaveUnreadMessages(room)}
+            //                   highlight={highlight}
+            //                   isInvite={false}
+            //                   onClick={this.onRoomTileClick}
+            //         />,
+            //     );
+            //}
+        }
+        // const RoomDetailList = sdk.getComponent('rooms.RoomDetailList');
+        //
+        // const roomDetailListClassName = classnames({
+        //     "mx_fadable": true,
+        //     "mx_fadable_faded": this.state.editing,
+        // });
+        // console.log('ROOM NODES', this.state.groupRooms);
+        // return (
+        //         <RoomDetailList
+        //             rooms={this.state.groupRooms}
+        //             className={roomDetailListClassName} />
+        // );
     },
 
     _getFeaturedRoomsNode: function() {

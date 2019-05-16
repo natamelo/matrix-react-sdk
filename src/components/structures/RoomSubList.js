@@ -92,7 +92,7 @@ const RoomSubList = React.createClass({
 
     __setPlayOrPauseRing: function() {
         const subListNotifications = !this.props.isInvite ?
-        RoomNotifs.aggregateNotificationCount(this.props.list) : 
+        RoomNotifs.aggregateNotificationCount(this.props.list) :
         {count: 0, highlight: true};
         const subListNotifCount = subListNotifications.count;
         if (subListNotifCount > 0) {
@@ -350,23 +350,23 @@ const RoomSubList = React.createClass({
             } else if (this._canUseLazyListRendering()) {
                 return <div ref="subList" className={subListClasses}>
                     {this._getHeaderJsx(isCollapsed)}
-                    <IndicatorScrollbar ref="scroller" className="mx_RoomSubList_scroll" onScroll={ this._onScroll }>
+                    <div className="mx_Tiles-Container">
                         <LazyRenderList
                             scrollTop={this.state.scrollTop }
                             height={ this.state.scrollerHeight }
                             renderItem={ this.makeRoomTile }
                             itemHeight={34}
                             items={ this.props.list } />
-                    </IndicatorScrollbar>
+                    </div>
                 </div>;
             } else {
                 const roomTiles = this.props.list.map(r => this.makeRoomTile(r));
                 const tiles = roomTiles.concat(this.props.extraTiles);
                 return <div ref="subList" className={subListClasses}>
                     {this._getHeaderJsx(isCollapsed)}
-                    <IndicatorScrollbar ref="scroller" className="mx_RoomSubList_scroll" onScroll={ this._onScroll }>
+                    <div className="mx_Tiles-Container">
                         { tiles }
-                    </IndicatorScrollbar>
+                    </div>
                 </div>;
             }
         } else {

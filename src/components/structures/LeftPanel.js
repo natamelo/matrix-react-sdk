@@ -32,6 +32,8 @@ const MatrixClientPeg = require("../../MatrixClientPeg");
 import GroupStore from '../../stores/GroupStore';
 
 const LeftPanel = React.createClass({
+    GROUP_ROOM_MAP: new Map(),
+
     displayName: 'LeftPanel',
 
     // NB. If you add props, don't forget to update
@@ -58,6 +60,9 @@ const LeftPanel = React.createClass({
             const groupMap = new Map();
             for (const g of result.groups) {
                 groupMap.set(g, true);
+                matrix.getGroupRooms(g).done((gr) => {
+                    this.GROUP_ROOM_MAP.set(g, gr.chunk);
+                });
             }
             this.setState({groups: groupMap, error: null});
         }, (err) => {
@@ -105,6 +110,10 @@ const LeftPanel = React.createClass({
         }
 
         if (this.state.groups !== nextState.groups) {
+            return true;
+        }
+
+        if (this.GROUP_ROOM_MAP !== nextState.GROUP_ROOM_MAP) {
             return true;
         }
 
@@ -236,7 +245,7 @@ const LeftPanel = React.createClass({
     },
 
     chevronClick: function(groupId) {
-      let atualMap = this.state.groups;
+      const atualMap = this.state.groups;
       atualMap.set(groupId, !atualMap.get(groupId));
       this.setState({groups: atualMap, error: null});
       this.forceUpdate();
@@ -244,49 +253,57 @@ const LeftPanel = React.createClass({
 
     _groupsList() {
         const groupNodes = [];
-        const GroupCleanTile = sdk.getComponent("groups.GroupCleanTile");
-        const GroupCleanView = sdk.getComponent('structures.GroupCleanView');
+        const RoomList = sdk.getComponent('rooms.RoomList');
 
-        if (this.state.groups) {
+        if (this.state.groups && this.GROUP_ROOM_MAP.size > 0) {
             for (const [g, collapsed] of this.state.groups) {
-                let chevron;
-                const chevronClasses = classNames({
-                    'mx_RoomSubList_chevron': true,
-                    'mx_RoomSubList_chevronRight': collapsed,
-                    'mx_RoomSubList_chevronDown': !collapsed,
-                });
-                chevron = (<div className={chevronClasses}></div>);
-
-                if (collapsed) {
-                    groupNodes.push(
-                        <div onClick={() => this.chevronClick(g)} className="mx_RoomSubList_labelContainer" title="" ref="header">
-                            <div className="mx_RoomSubList_label mx_RoomTile_name" >
-                                { chevron }
-                                <GroupCleanTile key={g} groupId={g} />
-                            </div>
-                        </div>,
-                    );
-                } else {
-                    groupNodes.push(
-                        <div onClick={() => this.chevronClick(g)} className="mx_RoomSubList_labelContainer" title="" ref="header">
-                            <div className="mx_RoomSubList_label mx_RoomTile_name" >
-                                { chevron }
-                                <GroupCleanTile key={g} groupId={g} />
-                            </div>
-                        </div>,
-                        <GroupCleanView groupId={g} />,
-                    );
-                }
+                groupNodes.push(
+                    <RoomList
+                        key={g}
+                        ref={this.collectRoomList}
+                        resizeNotifier={this.props.resizeNotifier}
+                        collapsed={this.props.collapsed}
+                        searchFilter={this.state.searchFilter}
+                        ConferenceHandler={VectorConferenceHandler}
+                        group={g}
+                        groupRooms={this.GROUP_ROOM_MAP.get(g)} />,
+                );
             }
+        } else {
+            const Spinner = sdk.getComponent('views.elements.Spinner');
+            return <Spinner />;
         }
         return groupNodes;
     },
 
     render: function() {
+        const groupList = this._groupsList();
+        const RoomBreadcrumbs = sdk.getComponent('rooms.RoomBreadcrumbs');
+        const TagPanel = sdk.getComponent('structures.TagPanel');
+        const CustomRoomTagPanel = sdk.getComponent('structures.CustomRoomTagPanel');
         const TopLeftMenuButton = sdk.getComponent('structures.TopLeftMenuButton');
+        const SearchBox = sdk.getComponent('structures.SearchBox');
         const CallPreview = sdk.getComponent('voip.CallPreview');
 
-        const tagPanelEnabled = SettingsStore.getValue("TagPanel.enableTagPanel");
+        // const tagPanelEnabled = SettingsStore.getValue("TagPanel.enableTagPanel");
+        const tagPanelEnabled = false;
+        let tagPanelContainer;
+
+        const isCustomTagsEnabled = SettingsStore.isFeatureEnabled("feature_custom_tags");
+
+        if (tagPanelEnabled) {
+            tagPanelContainer = (<div className="mx_LeftPanel_tagPanelContainer">
+                <TagPanel />
+                { isCustomTagsEnabled ? <CustomRoomTagPanel /> : undefined }
+                <TagPanelButtons />
+            </div>);
+        } else {
+            tagPanelContainer = (<div className="mx_LeftPanel_tagPanelContainer disabled">
+                <TagPanel />
+                { isCustomTagsEnabled ? <CustomRoomTagPanel /> : undefined }
+                <TagPanelButtons />
+            </div>);
+        }
 
         const containerClasses = classNames(
             "mx_LeftPanel_container", "mx_fadable",
@@ -297,81 +314,31 @@ const LeftPanel = React.createClass({
             },
         );
 
-        const groupList = this._groupsList();
+        const searchBox = (<SearchBox
+            enableRoomSearchFocus={true}
+            placeholder={ _t('Filter room names') }
+            onSearch={ this.onSearch }
+            onCleared={ this.onSearchCleared }
+            collapsed={this.props.collapsed} />);
+
+        let breadcrumbs;
+        if (this.state.breadcrumbs) {
+            breadcrumbs = (<RoomBreadcrumbs collapsed={this.props.collapsed} />);
+        }
 
         return (
             <div className={containerClasses}>
+                { tagPanelContainer }
                 <aside className={"mx_LeftPanel dark-panel"} onKeyDown={ this._onKeyDown } onFocus={ this._onFocus } onBlur={ this._onBlur }>
                     <TopLeftMenuButton collapsed={ this.props.collapsed } />
+                    { breadcrumbs }
+                    {/*{ searchBox }*/}
                     <CallPreview ConferenceHandler={VectorConferenceHandler} />
                     { groupList }
                 </aside>
             </div>
         );
     },
-
-    // OLD RENDER FUNC
-    // render: function() {
-    //     const RoomList = sdk.getComponent('rooms.RoomList');
-    //     const RoomBreadcrumbs = sdk.getComponent('rooms.RoomBreadcrumbs');
-    //     const TagPanel = sdk.getComponent('structures.TagPanel');
-    //     const CustomRoomTagPanel = sdk.getComponent('structures.CustomRoomTagPanel');
-    //     const TopLeftMenuButton = sdk.getComponent('structures.TopLeftMenuButton');
-    //     const SearchBox = sdk.getComponent('structures.SearchBox');
-    //     const CallPreview = sdk.getComponent('voip.CallPreview');
-    //
-    //     const tagPanelEnabled = SettingsStore.getValue("TagPanel.enableTagPanel");
-    //     let tagPanelContainer;
-    //
-    //     const isCustomTagsEnabled = SettingsStore.isFeatureEnabled("feature_custom_tags");
-    //
-    //     if (tagPanelEnabled) {
-    //         tagPanelContainer = (<div className="mx_LeftPanel_tagPanelContainer">
-    //             <TagPanel />
-    //             { isCustomTagsEnabled ? <CustomRoomTagPanel /> : undefined }
-    //             <TagPanelButtons />
-    //         </div>);
-    //     }
-    //
-    //     const containerClasses = classNames(
-    //         "mx_LeftPanel_container", "mx_fadable",
-    //         {
-    //             "collapsed": this.props.collapsed,
-    //             "mx_LeftPanel_container_hasTagPanel": tagPanelEnabled,
-    //             "mx_fadable_faded": this.props.disabled,
-    //         },
-    //     );
-    //
-    //     const searchBox = (<SearchBox
-    //         enableRoomSearchFocus={true}
-    //         placeholder={ _t('Filter room names') }
-    //         onSearch={ this.onSearch }
-    //         onCleared={ this.onSearchCleared }
-    //         collapsed={this.props.collapsed} />);
-    //
-    //     let breadcrumbs;
-    //     if (this.state.breadcrumbs) {
-    //         breadcrumbs = (<RoomBreadcrumbs collapsed={this.props.collapsed} />);
-    //     }
-    //
-    //     return (
-    //         <div className={containerClasses}>
-    //             { tagPanelContainer }
-    //             <aside className={"mx_LeftPanel dark-panel"} onKeyDown={ this._onKeyDown } onFocus={ this._onFocus } onBlur={ this._onBlur }>
-    //                 <TopLeftMenuButton collapsed={ this.props.collapsed } />
-    //                 { breadcrumbs }
-    //                 { searchBox }
-    //                 <CallPreview ConferenceHandler={VectorConferenceHandler} />
-    //                 <RoomList
-    //                     ref={this.collectRoomList}
-    //                     resizeNotifier={this.props.resizeNotifier}
-    //                     collapsed={this.props.collapsed}
-    //                     searchFilter={this.state.searchFilter}
-    //                     ConferenceHandler={VectorConferenceHandler} />
-    //             </aside>
-    //         </div>
-    //     );
-    // },
 });
 
 module.exports = LeftPanel;
