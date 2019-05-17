@@ -30,6 +30,7 @@ import ContentMessages from '../../../ContentMessages';
 import classNames from 'classnames';
 
 import E2EIcon from './E2EIcon';
+import PredefinedMessage from './PredefinedMessage';
 
 const formatButtonList = [
     _td("bold"),
@@ -416,6 +417,7 @@ export default class MessageComposer extends React.Component {
                     permalinkCreator={this.props.permalinkCreator} />,
                 showFormattingButton ? <FormattingButton key="controls_formatting"
                     showFormatting={this.state.showFormatting} onClickHandler={this.onToggleFormattingClicked} /> : null,
+                <PredefinedMessage key='predefinedmessage_controls_button' room={this.props.room} />,
                 <Stickerpicker key='stickerpicker_controls_button' room={this.props.room} />,
                 <UploadButton key="controls_upload" roomId={this.props.room.roomId} />,
                 callInProgress ? <HangupButton key="controls_hangup" roomId={this.props.room.roomId} /> : null,
