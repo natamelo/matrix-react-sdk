@@ -44,6 +44,7 @@ import FlairStore from "../../../stores/FlairStore";
 const HIDE_CONFERENCE_CHANS = true;
 const STANDARD_TAGS_REGEX = /^(m\.(favourite|lowpriority|server_notice)|im\.vector\.fake\.(invite|recent|direct|archived))$/;
 const HOVER_MOVE_TIMEOUT = 1000;
+const INTERVENTION_GROUP_ID = '+grupo_intervencao';
 
 function labelForTagName(tagName) {
     if (tagName.startsWith('u.')) return tagName.slice(2);
@@ -778,7 +779,15 @@ module.exports = React.createClass({
                 headerItems: this._getHeaderItems('im.vector.fake.recent'),
                 order: "recent",
                 incomingCall: incomingCallIfTaggedAs('im.vector.fake.recent'),
-                onAddRoom: () => {dis.dispatch({action: 'view_room_directory'});},
+                onAddRoom: () => {
+                    const groupId = this.props.group.split(':')[0];
+                    console.log('GROUP ID', groupId);
+                    if (groupId === INTERVENTION_GROUP_ID) {
+                        dis.dispatch({action: 'view_create_intervention'});
+                    } else {
+                        dis.dispatch({action: 'view_create_room'});
+                    }
+                },
             },
         ];
         const tagSubLists = Object.keys(this.state.lists)
