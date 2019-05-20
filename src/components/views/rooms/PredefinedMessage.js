@@ -14,6 +14,9 @@ export default class PredefinedMessage extends React.Component {
         this._onShowButtonsClick = this._onShowButtonsClick.bind(this);
         this._onHideButtonsClick = this._onHideButtonsClick.bind(this);
         this._onRequestStartClicked = this._onRequestStartClicked.bind(this);
+        this._onAuthorizeStartClicked = this._onAuthorizeStartClicked.bind(this);
+        this._onInformCancelationClicked = this._onInformCancelationClicked.bind(this);
+        this._onCheckCancelationClicked = this._onCheckCancelationClicked.bind(this);
         this._onFinished = this._onFinished.bind(this);
 
         this.state = {
@@ -23,7 +26,7 @@ export default class PredefinedMessage extends React.Component {
             buttonsChevronOffset: null,
         };
 
-        this.popoverWidth = 300;
+        this.popoverWidth = 230;
         this.popoverHeight = 100;
 
     }
@@ -68,10 +71,47 @@ export default class PredefinedMessage extends React.Component {
     }
 
     _onRequestStartClicked() {
-        console.log("entrou");
         const content = ContentHelpers.makeTextMessage("Solicitamos autorização para iniciar a intervenção");
         content['action'] = 'create_intervention'
-        console.log("content: " + JSON.stringify(content));
+        MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
+            dis.dispatch({
+                action: 'message_sent',
+            });
+        }).catch((e) => {
+            //TODO
+            //onSendMessageFailed(e, this.props.room.roomId);
+        });
+    }
+
+    _onAuthorizeStartClicked() {
+        const content = ContentHelpers.makeTextMessage("Autorizamos início da intervenção");
+        content['action'] = 'authorize_intervention'
+        MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
+            dis.dispatch({
+                action: 'message_sent',
+            });
+        }).catch((e) => {
+            //TODO
+            //onSendMessageFailed(e, this.props.room.roomId);
+        });
+    }
+
+    _onInformCancelationClicked() {
+        const content = ContentHelpers.makeTextMessage("Informamos que a intervenção foi cancelada");
+        content['action'] = 'inform_cancelation'
+        MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
+            dis.dispatch({
+                action: 'message_sent',
+            });
+        }).catch((e) => {
+            //TODO
+            //onSendMessageFailed(e, this.props.room.roomId);
+        });
+    }
+
+    _onCheckCancelationClicked() {
+        const content = ContentHelpers.makeTextMessage("Estamos cientes do cancelamento");
+        content['action'] = 'check_cancelation'
         MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
             dis.dispatch({
                 action: 'message_sent',
@@ -83,9 +123,67 @@ export default class PredefinedMessage extends React.Component {
     }
 
     _getButtonsContent() {
-        return (<div>
-                <span className="mx_PredefinedMessages_RequestStartButton" onClick={this._onRequestStartClicked}>{_t("Request to start")}</span>
-                <span className="mx_PredefinedMessages_InformCancelationButton" onClick={this._onRequestStartClicked}>{_t("Inform Cancelation")}</span></div>);
+        const isCteepUser = localStorage.getItem('mx_user_type') === 'cteep';
+        const interventionStatus = this.props.room.currentState.getInterventionStatus();
+        console.log(">>> " + interventionStatus);
+        var content = null;
+
+        if (interventionStatus) {
+            if (interventionStatus === 'Solicitada') {
+                if (isCteepUser) {
+                    return (<div><span className="mx_PredefinedMessages_RequestStartButton mx_PredefinedMessages_Disable">{_t("Request to start")}</span>
+                            <span className="mx_PredefinedMessages_InformCancelationButton" onClick={this._onInformCancelationClicked}>{_t("Inform Cancelation")}</span></div>);
+                } else {
+                    return (<div><span className="mx_PredefinedMessages_AuthorizeStartButton" onClick={this._onAuthorizeStartClicked}>{_t("Authorize to start")}</span>
+                        <span className="mx_PredefinedMessages_CheckedButton  mx_PredefinedMessages_Disable">{_t("Check Cancelation")}</span></div>);            
+                }        
+            } else if (interventionStatus === 'Autorizada') {
+                if (isCteepUser) {
+                    return (<div>
+                        <span className="mx_PredefinedMessages_RequestStartButton  mx_PredefinedMessages_Disable">{_t("Request to start")}</span>
+                        <span className="mx_PredefinedMessages_InformCancelationButton" onClick={this._onInformCancelationClicked}>{_t("Inform Cancelation")}</span></div>);        
+                } else {
+                    return (<div>
+                        <span className="mx_PredefinedMessages_AuthorizeStartButton mx_PredefinedMessages_Disable">{_t("Authorize to start")}</span>
+                        <span className="mx_PredefinedMessages_CheckedButton mx_PredefinedMessages_Disable">{_t("Check Cancelation")}</span></div>);
+                }    
+    
+            } else if (interventionStatus === 'Cancelamento Informado') {
+                if (isCteepUser) {
+                    return (<div>
+                        <span className="mx_PredefinedMessages_RequestStartButton mx_PredefinedMessages_Disable">{_t("Request to start")}</span>
+                        <span className="mx_PredefinedMessages_InformCancelationButton mx_PredefinedMessages_Disable">{_t("Inform Cancelation")}</span></div>);        
+                } else {
+                    return (<div>
+                        <span className="mx_PredefinedMessages_AuthorizeStartButton mx_PredefinedMessages_Disable">{_t("Authorize to start")}</span>
+                        <span className="mx_PredefinedMessages_CheckedButton" onClick={this._onCheckCancelationClicked}>{_t("Check Cancelation")}</span></div>);        
+                }    
+    
+            } else if (interventionStatus === 'Ciente do Cancelamento') {
+                if (isCteepUser) {
+                    return (<div>
+                        <span className="mx_PredefinedMessages_RequestStartButton  mx_PredefinedMessages_Disable">{_t("Request to start")}</span>
+                        <span className="mx_PredefinedMessages_InformCancelationButton  mx_PredefinedMessages_Disable">{_t("Inform Cancelation")}</span></div>);        
+                } else {
+                    return (<div>
+                        <span className="mx_PredefinedMessages_AuthorizeStartButton mx_PredefinedMessages_Disable">{_t("Authorize to start")}</span>
+                        <span className="mx_PredefinedMessages_CheckedButton  mx_PredefinedMessages_Disable">{_t("Check Cancelation")}</span></div>);        
+                }    
+    
+            }
+        } else {
+            if (isCteepUser) {
+                return (<div>
+                    <span className="mx_PredefinedMessages_RequestStartButton" onClick={this._onRequestStartClicked}>{_t("Request to start")}</span>
+                    <span className="mx_PredefinedMessages_InformCancelationButton  mx_PredefinedMessages_Disable" onClick={this._onInformCancelationClicked}>{_t("Inform Cancelation")}</span></div>);        
+            } else {
+                return (<div>
+                    <span className="mx_PredefinedMessages_AuthorizeStartButton  mx_PredefinedMessages_Disable">{_t("Authorize to start")}</span>
+                    <span className="mx_PredefinedMessages_CheckedButton  mx_PredefinedMessages_Disable" >{_t("Check Cancelation")}</span></div>);        
+            }    
+        }
+
+        return (<div>{content}</div>)
     }
 
     render() {

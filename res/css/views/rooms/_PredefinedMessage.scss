@@ -13,6 +13,7 @@
     display: inline-block;
     cursor: pointer;
     top: 6px;
+    left: 10px;
     width: 200px;
     height: 20px;
     padding: 5px;
@@ -31,6 +32,7 @@
     display: inline-block;
     cursor: pointer;
     top: 40px;
+    left: 10px;
     padding: 5px;
     width: 200px;
     height: 20px;
@@ -42,4 +44,47 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.mx_PredefinedMessages_AuthorizeStartButton {
+    position: absolute;
+    display: inline-block;
+    cursor: pointer;
+    top: 6px;
+    left: 10px;
+    width: 200px;
+    height: 20px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color:#03b381;
+    color: #FFFFFF;
+    text-align:center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mx_PredefinedMessages_CheckedButton {
+    position: absolute;
+    display: inline-block;
+    cursor: pointer;
+    top: 40px;
+    left: 10px;
+    padding: 5px;
+    width: 200px;
+    height: 20px;
+    border-radius: 5px;
+    background-color:#eda454;
+    color: #FFFFFF;
+    text-align:center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mx_PredefinedMessages_Disable {
+    background-color:#c7c6c5;
+    cursor: default;
 }
