@@ -395,9 +395,9 @@ export default class MessageComposer extends React.Component {
     render() {
         var interventionButtons = null;
         
-        if (this.props.groupId === 'grupo_intervencao') {
+        //if (this.props.groupId === 'grupo_intervencao') {
             interventionButtons = <PredefinedMessage key='predefinedmessage_controls_button' room={this.props.room} />;
-        }
+        //}
     
         const controls = [
             this.state.me ? <ComposerAvatar key="controls_avatar" me={this.state.me} /> : null,
