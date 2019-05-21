@@ -325,6 +325,7 @@ module.exports = React.createClass({
         dis.dispatch({action: 'view_create_room'});
     },
 
+
     onJoinClick: function(alias) {
         // If we don't have a particular instance id selected, just show that rooms alias
         if (!this.state.instanceId) {

@@ -596,6 +596,9 @@ export default React.createClass({
             case 'view_create_room':
                 this._createRoom();
                 break;
+            case 'view_create_intervention':
+                this._createInterventionRoom();
+                break;
             case 'view_create_group': {
                 const CreateGroupDialog = sdk.getComponent("dialogs.CreateGroupDialog");
                 Modal.createTrackedDialog('Create Community', '', CreateGroupDialog);
@@ -970,6 +973,22 @@ export default React.createClass({
     _createRoom: function() {
         const CreateRoomDialog = sdk.getComponent('dialogs.CreateRoomDialog');
         Modal.createTrackedDialog('Create Room', '', CreateRoomDialog, {
+            onFinished: (shouldCreate, name, noFederate) => {
+                if (shouldCreate) {
+                    const createOpts = {};
+                    if (name) createOpts.name = name;
+                    if (noFederate) createOpts.creation_content = {'m.federate': false};
+                    createRoom({createOpts}).done((roomId) => {
+                        console.log("CREATE ROOM RESULT", roomId);
+                    });
+                }
+            },
+        });
+    },
+
+    _createInterventionRoom: function() {
+        const CreateInterventionRoomDialog = sdk.getComponent('dialogs.CreateInterventionRoomDialog');
+        Modal.createTrackedDialog('Create Room', '', CreateInterventionRoomDialog, {
             onFinished: (shouldCreate, name, noFederate) => {
                 if (shouldCreate) {
                     const createOpts = {};

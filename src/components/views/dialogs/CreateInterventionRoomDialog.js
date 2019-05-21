@@ -21,7 +21,7 @@ import SdkConfig from '../../../SdkConfig';
 import { _t } from '../../../languageHandler';
 
 export default React.createClass({
-    displayName: 'CreateRoomDialog',
+    displayName: 'CreateIntervationRoomDialog',
     propTypes: {
         onFinished: PropTypes.func.isRequired,
     },
@@ -45,19 +45,19 @@ export default React.createClass({
         const DialogButtons = sdk.getComponent('views.elements.DialogButtons');
         return (
             <BaseDialog className="mx_CreateRoomDialog" onFinished={this.props.onFinished}
-                title={_t('Create Room')}
+                title={_t('Create Intervention')}
             >
                 <form onSubmit={this.onOk}>
                     <div className="mx_Dialog_content">
                         <div className="mx_CreateRoomDialog_label">
-                            <label htmlFor="textinput"> { _t('Room name (optional)') } </label>
+                            <label htmlFor="textinput"> { _t('Intervention Code') } </label>
                         </div>
                         <div className="mx_CreateRoomDialog_input_container">
                             <input id="textinput" ref="textinput" className="mx_CreateRoomDialog_input" autoFocus={true} />
                         </div>
                     </div>
                 </form>
-                <DialogButtons primaryButton={_t('Create Room')}
+                <DialogButtons primaryButton={_t('Create Intervention')}
                     onPrimaryButtonClick={this.onOk}
                     onCancel={this.onCancel} />
             </BaseDialog>

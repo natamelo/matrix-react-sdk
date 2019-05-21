@@ -32,10 +32,12 @@ limitations under the License.
 */
 
 .mx_RoomSubList {
-    display: flex;
-    flex-direction: column;
+    display: inline;
 }
 
+.mx_Tiles-Container {
+    position: relative;
+}
 
 .mx_RoomSubList_nonEmpty .mx_AutoHideScrollbar_offset {
     padding-bottom: 4px;
