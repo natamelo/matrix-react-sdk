@@ -71,6 +71,7 @@ export default class PredefinedMessage extends React.Component {
     }
 
     _onRequestStartClicked() {
+        this._onHideButtonsClick();
         const content = ContentHelpers.makeTextMessage("Solicitamos autorização para iniciar a intervenção");
         content['action'] = 'create_intervention'
         MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
@@ -84,6 +85,7 @@ export default class PredefinedMessage extends React.Component {
     }
 
     _onAuthorizeStartClicked() {
+        this._onHideButtonsClick();
         const content = ContentHelpers.makeTextMessage("Autorizamos início da intervenção");
         content['action'] = 'authorize_intervention'
         MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
@@ -97,6 +99,7 @@ export default class PredefinedMessage extends React.Component {
     }
 
     _onInformCancelationClicked() {
+        this._onHideButtonsClick();
         const content = ContentHelpers.makeTextMessage("Informamos que a intervenção foi cancelada");
         content['action'] = 'inform_cancelation'
         MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
@@ -110,6 +113,7 @@ export default class PredefinedMessage extends React.Component {
     }
 
     _onCheckCancelationClicked() {
+        this._onHideButtonsClick();
         const content = ContentHelpers.makeTextMessage("Estamos cientes do cancelamento");
         content['action'] = 'check_cancelation'
         MatrixClientPeg.get().sendMessage(this.props.room.roomId, content).then((res) => {
@@ -125,7 +129,6 @@ export default class PredefinedMessage extends React.Component {
     _getButtonsContent() {
         const isCteepUser = localStorage.getItem('mx_user_type') === 'cteep';
         const interventionStatus = this.props.room.currentState.getInterventionStatus();
-        console.log(">>> " + interventionStatus);
         var content = null;
 
         if (interventionStatus) {
