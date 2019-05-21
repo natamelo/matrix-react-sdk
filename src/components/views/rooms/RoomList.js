@@ -37,6 +37,8 @@ import CustomRoomTagStore from '../../../stores/CustomRoomTagStore';
 import GroupStore from '../../../stores/GroupStore';
 import RoomSubList from '../../structures/RoomSubList';
 import ResizeHandle from '../elements/ResizeHandle';
+import createRoom from "../../../createRoom";
+import Modal from "../../../Modal";
 
 import {Resizer} from '../../../resizer';
 import {Layout, Distributor} from '../../../resizer/distributors/roomsublist2';
@@ -475,6 +477,7 @@ module.exports = React.createClass({
         for (const l of Object.values(lists)) {
             totalRooms += l.length;
         }
+
         this.setState({
             lists,
             totalRoomCount: totalRooms,
@@ -732,6 +735,45 @@ module.exports = React.createClass({
         this.resizeContainer = el;
     },
 
+    _createRoom: function(groupId) {
+        const CreateRoomDialog = sdk.getComponent('dialogs.CreateRoomDialog');
+        Modal.createTrackedDialog('Create Room', '', CreateRoomDialog, {
+            onFinished: (shouldCreate, name, noFederate) => {
+                if (shouldCreate) {
+                    const createOpts = {};
+                    if (name) createOpts.name = name;
+                    if (noFederate) createOpts.creation_content = {'m.federate': false};
+                    createRoom({createOpts}).done((roomId) => {
+                        const matrix = MatrixClientPeg.get();
+                        matrix.addRoomToGroup(this.props.group, roomId, true).done();
+                        this.updateVisibleRooms();
+                    });
+                }
+            },
+        });
+    },
+
+    _createInterventionRoom: function(groupId) {
+        const CreateInterventionRoomDialog = sdk.getComponent('dialogs.CreateInterventionRoomDialog');
+        Modal.createTrackedDialog('Create Room', '', CreateInterventionRoomDialog, {
+            onFinished: (shouldCreate, name, noFederate) => {
+                if (shouldCreate) {
+                    const createOpts = {};
+                    if (name) createOpts.name = name;
+                    if (noFederate) createOpts.creation_content = {'m.federate': false};
+                    createRoom({createOpts}).done((roomId) => {
+                        const matrix = MatrixClientPeg.get();
+                        matrix.addRoomToGroup(this.props.group, roomId, true).done(
+                            () => {
+                                this.updateVisibleRooms();
+                            },
+                        );
+                    });
+                }
+            },
+        });
+    },
+
     render: function() {
         const incomingCallIfTaggedAs = (tagName) => {
             if (!this.state.incomingCall) return null;
@@ -781,11 +823,14 @@ module.exports = React.createClass({
                 incomingCall: incomingCallIfTaggedAs('im.vector.fake.recent'),
                 onAddRoom: () => {
                     const groupId = this.props.group.split(':')[0];
-                    console.log('GROUP ID', groupId);
                     if (groupId === INTERVENTION_GROUP_ID) {
-                        dis.dispatch({action: 'view_create_intervention'});
+                        // dis.dispatch({action: 'view_create_intervention'});
+                        this._createInterventionRoom(groupId);
+                        this.componentDidMount();
                     } else {
-                        dis.dispatch({action: 'view_create_room'});
+                        // dis.dispatch({action: 'view_create_room'});
+                        this._createRoom(groupId);
+                        this.componentDidUpdate();
                     }
                 },
             },
