@@ -690,6 +690,7 @@ module.exports = withMatrixClient(React.createClass({
         const isSolicitation = content && content.open_solicitation;
         const shouldShowInTimeLine = !this.props.tileShape || !this.props.tileShape.includes("solicitation");
         const isCteepUser = localStorage.getItem('mx_user_type') === 'cteep';
+        const isOnsUser = localStorage.getItem('mx_user_type') === 'ons';
 
         if (shouldShowInTimeLine && isSolicitation && isCteepUser) {
             checkButton = (
@@ -697,7 +698,7 @@ module.exports = withMatrixClient(React.createClass({
             );    
         }     
 
-        if (shouldShowInTimeLine && isSolicitation && !isCteepUser) {
+        if (shouldShowInTimeLine && isSolicitation && isOnsUser) {
             cancelButton = (
                 <span className="mx_EventTile_Cancel_Button" onClick={this.onCancelClicked}> {_t("Cancel")} </span>
             );
@@ -707,7 +708,7 @@ module.exports = withMatrixClient(React.createClass({
         if (content.status === 'Ciente') {
             status = <div className="mx_EventTile_Checked"> {content.status} </div>
         } else if (content.status === 'Cancelado') {
-            status = <div className="mx_EventTile_Cancelado"> {content.status} </div>
+            status = <div className="mx_EventTile_Canceled"> {content.status} </div>
         } else {
             status = <div className="mx_EventTile_Requested"> {content.status} </div>    
         }
