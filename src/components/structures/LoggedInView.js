@@ -448,6 +448,7 @@ const LoggedInView = React.createClass({
 
         switch (this.props.page_type) {
             case PageTypes.RoomView:
+                
                 pageElement = <RoomView
                         ref='roomView'
                         autoJoin={this.props.autoJoin}
@@ -461,6 +462,7 @@ const LoggedInView = React.createClass({
                         collapsedRhs={this.props.collapsedRhs}
                         ConferenceHandler={this.props.ConferenceHandler}
                         resizeNotifier={this.props.resizeNotifier}
+                        groupId={this.state.currentGroupId}
                     />;
                 break;
 

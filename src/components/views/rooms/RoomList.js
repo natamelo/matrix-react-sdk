@@ -37,12 +37,16 @@ import CustomRoomTagStore from '../../../stores/CustomRoomTagStore';
 import GroupStore from '../../../stores/GroupStore';
 import RoomSubList from '../../structures/RoomSubList';
 import ResizeHandle from '../elements/ResizeHandle';
+import createRoom from "../../../createRoom";
+import Modal from "../../../Modal";
 
 import {Resizer} from '../../../resizer';
 import {Layout, Distributor} from '../../../resizer/distributors/roomsublist2';
+import FlairStore from "../../../stores/FlairStore";
 const HIDE_CONFERENCE_CHANS = true;
 const STANDARD_TAGS_REGEX = /^(m\.(favourite|lowpriority|server_notice)|im\.vector\.fake\.(invite|recent|direct|archived))$/;
 const HOVER_MOVE_TIMEOUT = 1000;
+const INTERVENTION_GROUP_ID = '+grupo_intervencao';
 
 function labelForTagName(tagName) {
     if (tagName.startsWith('u.')) return tagName.slice(2);
@@ -71,10 +75,11 @@ module.exports = React.createClass({
         ConferenceHandler: PropTypes.any,
         collapsed: PropTypes.bool.isRequired,
         searchFilter: PropTypes.string,
+        group: PropTypes.string,
+        groupRooms: PropTypes.arrayOf(PropTypes.any),
     },
 
     getInitialState: function() {
-
         this._hoverClearTimer = null;
         this._subListRefs = {
             // key => RoomSubList ref
@@ -126,11 +131,18 @@ module.exports = React.createClass({
             selectedTags: [],
             hover: false,
             customTags: CustomRoomTagStore.getTags(),
+            profile: null,
         };
     },
 
     componentWillMount: function() {
         this.mounted = false;
+
+        FlairStore.getGroupProfileCached(this.context.matrixClient, this.props.group).then((profile) => {
+            this.setState({profile});
+        }).catch((err) => {
+            console.error('Error whilst getting cached profile for GroupCleanTile', err);
+        });
 
         const cli = MatrixClientPeg.get();
 
@@ -203,7 +215,7 @@ module.exports = React.createClass({
         this.resizer.setClassNames({
             handle: "mx_ResizeHandle",
             vertical: "mx_ResizeHandle_vertical",
-            reverse: "mx_ResizeHandle_reverse"
+            reverse: "mx_ResizeHandle_reverse",
         });
         this._layout.update(
             this._layoutSections,
@@ -465,6 +477,7 @@ module.exports = React.createClass({
         for (const l of Object.values(lists)) {
             totalRooms += l.length;
         }
+
         this.setState({
             lists,
             totalRoomCount: totalRooms,
@@ -510,8 +523,17 @@ module.exports = React.createClass({
             // $roomId: true,
         };
 
+        const roomIds = [];
+        for (const room of this.props.groupRooms) {
+            roomIds.push(room.room_id);
+        }
+
         this._visibleRooms.forEach((r) => {
-            isRoomVisible[r.roomId] = true;
+            if (roomIds.includes(r.roomId)) {
+                isRoomVisible[r.roomId] = true;
+            } else {
+                isRoomVisible[r.roomId] = false;
+            }
         });
 
         Object.keys(lists).forEach((tagName) => {
@@ -676,7 +698,7 @@ module.exports = React.createClass({
             props = Object.assign({}, defaultProps, props);
             const isLast = i === subListsProps.length - 1;
             const len = props.list.length + (props.extraTiles ? props.extraTiles.length : 0);
-            const {key, label, onHeaderClick, ... otherProps} = props;
+            const {key, label, onHeaderClick, ...otherProps} = props;
             const chosenKey = key || label;
             const onSubListHeaderClick = (collapsed) => {
                 this._handleCollapsedState(chosenKey, collapsed);
@@ -684,12 +706,12 @@ module.exports = React.createClass({
                     onHeaderClick(collapsed);
                 }
             };
-            let startAsHidden = props.startAsHidden || this.collapsedState[chosenKey];
+            const startAsHidden = props.startAsHidden || this.collapsedState[chosenKey];
             this._layoutSections.push({
                 id: chosenKey,
                 count: len,
             });
-            let subList = (<RoomSubList
+            const subList = (<RoomSubList
                 ref={this._subListRef.bind(this, chosenKey)}
                 startAsHidden={startAsHidden}
                 forceExpand={!!this.props.searchFilter}
@@ -701,7 +723,7 @@ module.exports = React.createClass({
             if (!isLast) {
                 return components.concat(
                     subList,
-                    <ResizeHandle key={chosenKey+"-resizer"} vertical={true} id={chosenKey} />
+                    <ResizeHandle key={chosenKey+"-resizer"} vertical={true} id={chosenKey} />,
                 );
             } else {
                 return components.concat(subList);
@@ -713,12 +735,54 @@ module.exports = React.createClass({
         this.resizeContainer = el;
     },
 
+    _createRoom: function(groupId) {
+        const CreateRoomDialog = sdk.getComponent('dialogs.CreateRoomDialog');
+        Modal.createTrackedDialog('Create Room', '', CreateRoomDialog, {
+            onFinished: (shouldCreate, name, noFederate) => {
+                if (shouldCreate) {
+                    const createOpts = {};
+                    if (name) createOpts.name = name;
+                    if (noFederate) createOpts.creation_content = {'m.federate': false};
+                    createRoom({createOpts}).done((roomId) => {
+                        const matrix = MatrixClientPeg.get();
+                        matrix.addRoomToGroup(this.props.group, roomId, true).done();
+                        this.updateVisibleRooms();
+                    });
+                }
+            },
+        });
+    },
+
+    _createInterventionRoom: function(groupId) {
+        const CreateInterventionRoomDialog = sdk.getComponent('dialogs.CreateInterventionRoomDialog');
+        Modal.createTrackedDialog('Create Room', '', CreateInterventionRoomDialog, {
+            onFinished: (shouldCreate, name, noFederate) => {
+                if (shouldCreate) {
+                    const createOpts = {};
+                    if (name) createOpts.name = name;
+                    if (noFederate) createOpts.creation_content = {'m.federate': false};
+                    createRoom({createOpts}).done((roomId) => {
+                        const matrix = MatrixClientPeg.get();
+                        matrix.addRoomToGroup(this.props.group, roomId, true).done(
+                            () => {
+                                this.updateVisibleRooms();
+                            },
+                        );
+                    });
+                }
+            },
+        });
+    },
+
     render: function() {
         const incomingCallIfTaggedAs = (tagName) => {
             if (!this.state.incomingCall) return null;
             if (this.state.incomingCallTag !== tagName) return null;
             return this.state.incomingCall;
         };
+
+        const profile = this.state.profile || {};
+        const groupName = profile.name || this.props.group;
 
         let subLists = [
             {
@@ -742,22 +806,33 @@ module.exports = React.createClass({
                 order: "manual",
                 incomingCall: incomingCallIfTaggedAs('m.favourite'),
             },
-            {
-                list: this.state.lists['im.vector.fake.direct'],
-                label: _t('People'),
-                tagName: "im.vector.fake.direct",
-                headerItems: this._getHeaderItems('im.vector.fake.direct'),
-                order: "recent",
-                incomingCall: incomingCallIfTaggedAs('im.vector.fake.direct'),
-                onAddRoom: () => {dis.dispatch({action: 'view_create_chat'})},
-            },
+            // {
+            //     list: this.state.lists['im.vector.fake.direct'],
+            //     label: _t('People'),
+            //     tagName: "im.vector.fake.direct",
+            //     headerItems: this._getHeaderItems('im.vector.fake.direct'),
+            //     order: "recent",
+            //     incomingCall: incomingCallIfTaggedAs('im.vector.fake.direct'),
+            //     onAddRoom: () => {dis.dispatch({action: 'view_create_chat'});},
+            // },
             {
                 list: this.state.lists['im.vector.fake.recent'],
-                label: _t('Rooms'),
+                label: groupName,
                 headerItems: this._getHeaderItems('im.vector.fake.recent'),
                 order: "recent",
                 incomingCall: incomingCallIfTaggedAs('im.vector.fake.recent'),
-                onAddRoom: () => {dis.dispatch({action: 'view_room_directory'})},
+                onAddRoom: () => {
+                    const groupId = this.props.group.split(':')[0];
+                    if (groupId === INTERVENTION_GROUP_ID) {
+                        // dis.dispatch({action: 'view_create_intervention'});
+                        this._createInterventionRoom(groupId);
+                        this.componentDidMount();
+                    } else {
+                        // dis.dispatch({action: 'view_create_room'});
+                        this._createRoom(groupId);
+                        this.componentDidUpdate();
+                    }
+                },
             },
         ];
         const tagSubLists = Object.keys(this.state.lists)
