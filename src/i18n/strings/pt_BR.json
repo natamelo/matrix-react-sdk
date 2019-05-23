@@ -922,6 +922,7 @@
     "Unable to reject invite": "Não foi possível rejeitar o convite",
     "Leave Community": "Deixar a comunidade",
     "Leave %(groupName)s?": "Quer sair da comunidade %(groupName)s?",
+    "There is no groups to show": "Não há grupos para mostrar",
     "Leave": "Sair",
     "Community Settings": "Configurações da comunidade",
     "These rooms are displayed to community members on the community page. Community members can join the rooms by clicking on them.": "Estas salas são exibidas para as/os integrantes da comunidade na página da comunidade. Integrantes da comunidade podem entrar nas salas ao clicar nas mesmas.",

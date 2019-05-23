@@ -77,6 +77,7 @@ module.exports = React.createClass({
         searchFilter: PropTypes.string,
         group: PropTypes.string,
         groupRooms: PropTypes.arrayOf(PropTypes.any),
+        onlyInvite: PropTypes.bool,
     },
 
     getInitialState: function() {
@@ -85,8 +86,8 @@ module.exports = React.createClass({
             // key => RoomSubList ref
         };
 
-        const sizesJson = window.localStorage.getItem("mx_roomlist_sizes");
-        const collapsedJson = window.localStorage.getItem("mx_roomlist_collapsed");
+        const sizesJson = window.localStorage.getItem("mx_roomlist_sizes" + this.props.group);
+        const collapsedJson = window.localStorage.getItem("mx_roomlist_collapsed" + this.props.group);
         this.subListSizes = sizesJson ? JSON.parse(sizesJson) : {};
         this.collapsedState = collapsedJson ? JSON.parse(collapsedJson) : {};
         this._layoutSections = [];
@@ -105,7 +106,7 @@ module.exports = React.createClass({
             // don't store height for collapsed sublists
             if (!this.collapsedState[key]) {
                 this.subListSizes[key] = size;
-                window.localStorage.setItem("mx_roomlist_sizes",
+                window.localStorage.setItem("mx_roomlist_sizes" + this.props.group,
                     JSON.stringify(this.subListSizes));
             }
         }, this.subListSizes, this.collapsedState, unfilteredOptions);
@@ -140,9 +141,7 @@ module.exports = React.createClass({
 
         FlairStore.getGroupProfileCached(this.context.matrixClient, this.props.group).then((profile) => {
             this.setState({profile});
-        }).catch((err) => {
-            console.error('Error whilst getting cached profile for GroupCleanTile', err);
-        });
+        }).catch((err) => {});
 
         const cli = MatrixClientPeg.get();
 
@@ -238,6 +237,8 @@ module.exports = React.createClass({
             forceLayoutUpdate = true;
         } else if (this.props.searchFilter && !prevProps.searchFilter) {
             this._layout = this._filteredLayout;
+            forceLayoutUpdate = true;
+        } else if (this.props.groupRooms !== prevProps.groupRooms) {
             forceLayoutUpdate = true;
         }
         this._layout.update(
@@ -523,18 +524,24 @@ module.exports = React.createClass({
             // $roomId: true,
         };
 
-        const roomIds = [];
-        for (const room of this.props.groupRooms) {
-            roomIds.push(room.room_id);
-        }
-
-        this._visibleRooms.forEach((r) => {
-            if (roomIds.includes(r.roomId)) {
-                isRoomVisible[r.roomId] = true;
-            } else {
-                isRoomVisible[r.roomId] = false;
+        if (!this.props.onlyInvite) {
+            const roomIds = [];
+            for (const room of this.props.groupRooms) {
+                roomIds.push(room.room_id);
             }
-        });
+
+            this._visibleRooms.forEach((r) => {
+                if (roomIds.includes(r.roomId)) {
+                    isRoomVisible[r.roomId] = true;
+                } else {
+                    isRoomVisible[r.roomId] = false;
+                }
+            });
+        } else {
+            this._visibleRooms.forEach((r) => {
+                isRoomVisible[r.roomId] = true;
+            });
+        }
 
         Object.keys(lists).forEach((tagName) => {
             const filteredRooms = lists[tagName].filter((taggedRoom) => {
@@ -652,7 +659,7 @@ module.exports = React.createClass({
     _handleCollapsedState: function(key, collapsed) {
         // persist collapsed state
         this.collapsedState[key] = collapsed;
-        window.localStorage.setItem("mx_roomlist_collapsed", JSON.stringify(this.collapsedState));
+        window.localStorage.setItem("mx_roomlist_collapsed" + this.props.group, JSON.stringify(this.collapsedState));
         // load the persisted size configuration of the expanded sub list
         if (collapsed) {
             this._layout.collapseSection(key);
@@ -743,10 +750,10 @@ module.exports = React.createClass({
                     const createOpts = {};
                     if (name) createOpts.name = name;
                     if (noFederate) createOpts.creation_content = {'m.federate': false};
+                    console.log('CREATE OPTS', createOpts);
                     createRoom({createOpts}).done((roomId) => {
                         const matrix = MatrixClientPeg.get();
                         matrix.addRoomToGroup(this.props.group, roomId, true).done();
-                        this.updateVisibleRooms();
                     });
                 }
             },
@@ -760,81 +767,105 @@ module.exports = React.createClass({
                 if (shouldCreate) {
                     const createOpts = {};
                     if (name) createOpts.name = name;
-                    if (noFederate) createOpts.creation_content = {'m.federate': false};
+                    if (noFederate) createOpts.creation_content = {'m.federate': true};
                     createRoom({createOpts}).done((roomId) => {
                         const matrix = MatrixClientPeg.get();
-                        matrix.addRoomToGroup(this.props.group, roomId, true).done(
-                            () => {
-                                this.updateVisibleRooms();
-                            },
-                        );
+                        matrix.addRoomToGroup(this.props.group, roomId, false).done();
                     });
                 }
             },
         });
     },
 
-    render: function() {
+    getSublists: function() {
         const incomingCallIfTaggedAs = (tagName) => {
             if (!this.state.incomingCall) return null;
             if (this.state.incomingCallTag !== tagName) return null;
             return this.state.incomingCall;
         };
 
-        const profile = this.state.profile || {};
-        const groupName = profile.name || this.props.group;
+        if (!this.props.onlyInvite) {
+            const profile = this.state.profile || {};
+            const groupName = profile.name || this.props.group;
 
-        let subLists = [
-            {
-                list: [],
-                extraTiles: this._makeGroupInviteTiles(this.props.searchFilter),
-                label: _t('Community Invites'),
-                order: "recent",
-                isInvite: true,
-            },
-            {
-                list: this.state.lists['im.vector.fake.invite'],
-                label: _t('Invites'),
-                order: "recent",
-                incomingCall: incomingCallIfTaggedAs('im.vector.fake.invite'),
-                isInvite: true,
-            },
-            {
-                list: this.state.lists['m.favourite'],
-                label: _t('Favourites'),
-                tagName: "m.favourite",
-                order: "manual",
-                incomingCall: incomingCallIfTaggedAs('m.favourite'),
-            },
-            // {
-            //     list: this.state.lists['im.vector.fake.direct'],
-            //     label: _t('People'),
-            //     tagName: "im.vector.fake.direct",
-            //     headerItems: this._getHeaderItems('im.vector.fake.direct'),
-            //     order: "recent",
-            //     incomingCall: incomingCallIfTaggedAs('im.vector.fake.direct'),
-            //     onAddRoom: () => {dis.dispatch({action: 'view_create_chat'});},
-            // },
-            {
-                list: this.state.lists['im.vector.fake.recent'],
-                label: groupName,
-                headerItems: this._getHeaderItems('im.vector.fake.recent'),
-                order: "recent",
-                incomingCall: incomingCallIfTaggedAs('im.vector.fake.recent'),
-                onAddRoom: () => {
-                    const groupId = this.props.group.split(':')[0];
-                    if (groupId === INTERVENTION_GROUP_ID) {
-                        // dis.dispatch({action: 'view_create_intervention'});
-                        this._createInterventionRoom(groupId);
-                        this.componentDidMount();
-                    } else {
-                        // dis.dispatch({action: 'view_create_room'});
-                        this._createRoom(groupId);
-                        this.componentDidUpdate();
-                    }
+            return [
+                {
+                    list: [],
+                    extraTiles: this._makeGroupInviteTiles(this.props.searchFilter),
+                    label: _t('Community Invites'),
+                    order: "recent",
+                    isInvite: true,
                 },
-            },
-        ];
+                {
+                    list: this.state.lists['im.vector.fake.invite'],
+                    label: _t('Invites'),
+                    order: "recent",
+                    incomingCall: incomingCallIfTaggedAs('im.vector.fake.invite'),
+                    isInvite: true,
+                },
+                {
+                    list: this.state.lists['m.favourite'],
+                    label: _t('Favourites'),
+                    tagName: "m.favourite",
+                    order: "manual",
+                    incomingCall: incomingCallIfTaggedAs('m.favourite'),
+                },
+                // {
+                //     list: this.state.lists['im.vector.fake.direct'],
+                //     label: _t('People'),
+                //     tagName: "im.vector.fake.direct",
+                //     headerItems: this._getHeaderItems('im.vector.fake.direct'),
+                //     order: "recent",
+                //     incomingCall: incomingCallIfTaggedAs('im.vector.fake.direct'),
+                //     onAddRoom: () => {dis.dispatch({action: 'view_create_chat'});},
+                // },
+                {
+                    list: this.state.lists['im.vector.fake.recent'],
+                    label: groupName,
+                    headerItems: this._getHeaderItems('im.vector.fake.recent'),
+                    order: "recent",
+                    incomingCall: incomingCallIfTaggedAs('im.vector.fake.recent'),
+                    onAddRoom: () => {
+                        const groupId = this.props.group.split(':')[0];
+                        if (groupId === INTERVENTION_GROUP_ID) {
+                            // dis.dispatch({action: 'view_create_intervention'});
+                            this._createInterventionRoom(groupId);
+                        } else {
+                            // dis.dispatch({action: 'view_create_room'});
+                            this._createRoom(groupId);
+                        }
+                    },
+                },
+            ];
+        } else {
+            return [
+                {
+                    list: [],
+                    extraTiles: this._makeGroupInviteTiles(this.props.searchFilter),
+                    label: _t('Community Invites'),
+                    order: "recent",
+                    isInvite: true,
+                },
+                {
+                    list: this.state.lists['im.vector.fake.invite'],
+                    label: _t('Invites'),
+                    order: "recent",
+                    incomingCall: incomingCallIfTaggedAs('im.vector.fake.invite'),
+                    isInvite: true,
+                },
+            ];
+        }
+    },
+
+    render: function() {
+        let subLists = this.getSublists();
+
+        const incomingCallIfTaggedAs = (tagName) => {
+            if (!this.state.incomingCall) return null;
+            if (this.state.incomingCallTag !== tagName) return null;
+            return this.state.incomingCall;
+        };
+
         const tagSubLists = Object.keys(this.state.lists)
             .filter((tagName) => {
                 return (!this.state.customTags || this.state.customTags[tagName]) &&

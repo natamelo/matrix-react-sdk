@@ -62,6 +62,7 @@ const LeftPanel = React.createClass({
                 groupMap.set(g, true);
                 matrix.getGroupRooms(g).done((gr) => {
                     this.GROUP_ROOM_MAP.set(g, gr.chunk);
+                    this.forceUpdate();
                 });
             }
             this.setState({groups: groupMap, error: null});
@@ -252,28 +253,45 @@ const LeftPanel = React.createClass({
     },
 
     _groupsList() {
-        const groupNodes = [];
         const RoomList = sdk.getComponent('rooms.RoomList');
 
-        if (this.state.groups && this.GROUP_ROOM_MAP.size > 0) {
-            for (const [g, collapsed] of this.state.groups) {
-                groupNodes.push(
-                    <RoomList
-                        key={g}
-                        ref={this.collectRoomList}
-                        resizeNotifier={this.props.resizeNotifier}
-                        collapsed={this.props.collapsed}
-                        searchFilter={this.state.searchFilter}
-                        ConferenceHandler={VectorConferenceHandler}
-                        group={g}
-                        groupRooms={this.GROUP_ROOM_MAP.get(g)} />,
-                );
-            }
-        } else {
+        if (this.state.group === null || this.GROUP_ROOM_MAP == null) {
             const Spinner = sdk.getComponent('views.elements.Spinner');
             return <Spinner />;
+        } else if (this.state.groups && this.GROUP_ROOM_MAP.size > 0) {
+            const groupNodes = [];
+            for (const [g, collapsed] of this.state.groups) {
+                if (this.GROUP_ROOM_MAP.get(g)) {
+                    groupNodes.push(
+                        <RoomList
+                            key={g}
+                            ref={this.collectRoomList}
+                            resizeNotifier={this.props.resizeNotifier}
+                            collapsed={this.props.collapsed}
+                            searchFilter={this.state.searchFilter}
+                            ConferenceHandler={VectorConferenceHandler}
+                            group={g}
+                            groupRooms={this.GROUP_ROOM_MAP.get(g)}
+                            onlyInvite={false} />,
+                    );
+                }
+            }
+            return groupNodes;
+        } else {
+            return <div>
+                    <RoomList
+                            key={'Only_group_invites'}
+                            ref={this.collectRoomList}
+                            resizeNotifier={this.props.resizeNotifier}
+                            collapsed={false}
+                            searchFilter={this.state.searchFilter}
+                            ConferenceHandler={VectorConferenceHandler}
+                            group={'only:invite'}
+                            onlyInvite={true} />
+                    <br />
+                    <b className="mx_NoGroups_text" >{_t('There is no groups to show').toUpperCase()}</b>
+                </div>;
         }
-        return groupNodes;
     },
 
     render: function() {
