@@ -78,6 +78,7 @@ module.exports = React.createClass({
         group: PropTypes.string,
         groupRooms: PropTypes.arrayOf(PropTypes.any),
         onlyInvite: PropTypes.bool,
+        _fetch: PropTypes.func,
     },
 
     getInitialState: function() {
@@ -742,6 +743,10 @@ module.exports = React.createClass({
         this.resizeContainer = el;
     },
 
+    updateLeftPanel: function() {
+        this.props._fetch();
+    },
+
     _createRoom: function(groupId) {
         const CreateRoomDialog = sdk.getComponent('dialogs.CreateRoomDialog');
         Modal.createTrackedDialog('Create Room', '', CreateRoomDialog, {
@@ -750,10 +755,13 @@ module.exports = React.createClass({
                     const createOpts = {};
                     if (name) createOpts.name = name;
                     if (noFederate) createOpts.creation_content = {'m.federate': false};
-                    console.log('CREATE OPTS', createOpts);
                     createRoom({createOpts}).done((roomId) => {
                         const matrix = MatrixClientPeg.get();
-                        matrix.addRoomToGroup(this.props.group, roomId, true).done();
+                        matrix.addRoomToGroup(this.props.group, roomId, true).done(
+                            () => {
+                                this.updateLeftPanel();
+                            },
+                        );
                     });
                 }
             },
@@ -767,10 +775,14 @@ module.exports = React.createClass({
                 if (shouldCreate) {
                     const createOpts = {};
                     if (name) createOpts.name = name;
-                    if (noFederate) createOpts.creation_content = {'m.federate': true};
+                    if (noFederate) createOpts.creation_content = {'m.federate': false};
                     createRoom({createOpts}).done((roomId) => {
                         const matrix = MatrixClientPeg.get();
-                        matrix.addRoomToGroup(this.props.group, roomId, false).done();
+                        matrix.addRoomToGroup(this.props.group, roomId, true).done(
+                            () => {
+                                this.updateLeftPanel();
+                            },
+                        );
                     });
                 }
             },

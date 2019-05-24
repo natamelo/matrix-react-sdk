@@ -76,6 +76,14 @@ const LeftPanel = React.createClass({
         });
     },
 
+    _fetchSingleGroup: function(groupId) {
+        const matrix = MatrixClientPeg.get();
+        matrix.getGroupRooms(groupId).done((gr) => {
+            this.GROUP_ROOM_MAP.set(groupId, gr.chunk);
+            this.forceUpdate();
+        });
+    },
+
     componentWillMount: function() {
         this._fetch();
         this.focusedElement = null;
@@ -272,6 +280,7 @@ const LeftPanel = React.createClass({
                             ConferenceHandler={VectorConferenceHandler}
                             group={g}
                             groupRooms={this.GROUP_ROOM_MAP.get(g)}
+                            _fetch={() => {this._fetchSingleGroup(g);}}
                             onlyInvite={false} />,
                     );
                 }
@@ -295,6 +304,7 @@ const LeftPanel = React.createClass({
     },
 
     render: function() {
+
         const groupList = this._groupsList();
         const RoomBreadcrumbs = sdk.getComponent('rooms.RoomBreadcrumbs');
         const TagPanel = sdk.getComponent('structures.TagPanel');
