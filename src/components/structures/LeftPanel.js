@@ -268,11 +268,13 @@ const LeftPanel = React.createClass({
             return <Spinner />;
         } else if (this.state.groups && this.GROUP_ROOM_MAP.size > 0) {
             const groupNodes = [];
+            console.log('GROUP ROOM MAP', this.GROUP_ROOM_MAP);
             for (const [g, collapsed] of this.state.groups) {
                 if (this.GROUP_ROOM_MAP.get(g)) {
+                    const key = Math.random();
                     groupNodes.push(
                         <RoomList
-                            key={g}
+                            key={key}
                             ref={this.collectRoomList}
                             resizeNotifier={this.props.resizeNotifier}
                             collapsed={this.props.collapsed}
