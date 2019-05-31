@@ -1017,6 +1017,7 @@
     "Hide panel": "Ocultar o painel",
     "You cannot delete this image. (%(code)s)": "Você não pode apagar esta imagem. (%(code)s)",
     "Cancel Sending": "Cancelar o envio",
+    "Solicitation Canceled": "Solicitação Cancelada",
     "This Room": "Esta sala",
     "The Home Server may be too old to support third party networks": "O servidor pode ser muito antigo para suportar redes de terceiros",
     "Resend": "Reenviar",

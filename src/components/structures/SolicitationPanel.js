@@ -53,7 +53,7 @@ const SolicitationPanel = React.createClass({
                     tileShape="solicitation"
                     empty={_t('You have no solicitations')}
                     showSolicitations={true}
-                    roomId={this.props.roomId} 
+                    roomId={this.props.roomId}
                 />
             );
         } else {

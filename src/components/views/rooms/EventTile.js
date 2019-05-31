@@ -290,7 +290,7 @@ module.exports = withMatrixClient(React.createClass({
                     }
                 }
             }  else if (key === 'mxEvent') {
-                
+
                 const rA = objA[key];
                 const rB = objB[key];
 
@@ -298,8 +298,8 @@ module.exports = withMatrixClient(React.createClass({
                     return false;
                 }
 
-                if (rA && rB && rA.event && rB.event && 
-                    rA.event.content && rB.event.content && 
+                if (rA && rB && rA.event && rB.event &&
+                    rA.event.content && rB.event.content &&
                     rB.event.content.status === 'Ciente') {
                     return false;
                 }
@@ -313,7 +313,6 @@ module.exports = withMatrixClient(React.createClass({
     },
 
     _checkSolicitation: function(event) {
-            
         const sendText = ContentHelpers.makeTextMessage;
         const replyContent = ReplyThread.makeReplyMixIn(event);
         const content = Object.assign(replyContent, sendText(_t("Checked")));
@@ -327,7 +326,7 @@ module.exports = withMatrixClient(React.createClass({
             }
             content.body = nestedReply.body + content.body;
         }
-        
+
         this.props.matrixClient.sendMessage(this.props.mxEvent.getRoomId(), content).then((res) => {
             dis.dispatch({
                 action: 'message_sent',
@@ -335,7 +334,32 @@ module.exports = withMatrixClient(React.createClass({
         }).catch((e) => {
             onSendMessageFailed(e, this.props.room);
         });
-    
+
+    },
+
+    _cancelSolicitation: function(event) {
+        const sendText = ContentHelpers.makeTextMessage;
+        const replyContent = ReplyThread.makeReplyMixIn(event);
+        const content = Object.assign(replyContent, sendText(_t("Solicitation Canceled")));
+
+        // Part of Replies fallback support - prepend the text we're sending
+        // with the text we're replying to
+        const nestedReply = ReplyThread.getNestedReplyText(event, this.props.permalinkCreator);
+        if (nestedReply) {
+            if (content.formatted_body) {
+                content.formatted_body = nestedReply.html + content.formatted_body;
+            }
+            content.body = nestedReply.body + content.body;
+        }
+
+        this.props.matrixClient.sendMessage(this.props.mxEvent.getRoomId(), content).then((res) => {
+            dis.dispatch({
+                action: 'message_sent',
+            });
+        }).catch((e) => {
+            onSendMessageFailed(e, this.props.room);
+        });
+
     },
 
     shouldHighlight: function() {
@@ -382,6 +406,10 @@ module.exports = withMatrixClient(React.createClass({
 
     onCheckClicked: function(e) {
         this._checkSolicitation(this.props.mxEvent);
+    },
+
+    onCancelClicked: function(e) {
+        this._cancelSolicitation(this.props.mxEvent);
     },
 
     toggleAllReadAvatars: function() {
@@ -649,30 +677,36 @@ module.exports = withMatrixClient(React.createClass({
                 sender = <SenderProfile mxEvent={this.props.mxEvent} enableFlair={true} />;
             }
         }
-        
+
         const editButton = (
             <span className="mx_EventTile_editButton" title={_t("Options")} onClick={this.onEditClicked} />
         );
 
         var checkButton = null;
-        
+
         const isSolicitation = content && content.open_solicitation;
         const shouldShowInTimeLine = !this.props.tileShape || !this.props.tileShape.includes("solicitation");
-        const isCteepUser = localStorage.getItem('mx_user_type') === 'cteep';
+        const userType = localStorage.getItem('mx_user_type');
+        const isCteepUser = userType === 'cteep';
+        const isOnsUser = userType === 'ons';
 
         if (shouldShowInTimeLine && isSolicitation && isCteepUser) {
             checkButton = (
                 <span className="mx_EventTile_checkButton" onClick={this.onCheckClicked}>  {_t("Check")} </span>
-            );    
-        }     
+            );
+        } else if (shouldShowInTimeLine && isSolicitation && isOnsUser) {
+            checkButton = (
+                <span className="mx_EventTile_checkButton red" onClick={this.onCancelClicked}>  {_t("Cancel")} </span>
+            );
+        }
 
         var status = null;
         if (content.status === 'Ciente') {
             status = <div className="mx_EventTile_Checked"> {content.status} </div>
         } else {
-            status = <div className="mx_EventTile_Requested"> {content.status} </div>    
+            status = <div className="mx_EventTile_Requested"> {content.status} </div>
         }
-        
+
         const timestamp = this.props.mxEvent.getTs() ?
             <MessageTimestamp showTwelveHour={this.props.isTwelveHour} ts={this.props.mxEvent.getTs()} /> : null;
 
@@ -854,7 +888,7 @@ module.exports = withMatrixClient(React.createClass({
                                            onHeightChanged={this.props.onHeightChanged} />
                             { keyRequestInfo }
                             { editButton }
-                            { checkButton } 
+                            { checkButton }
                         </div>
                         {
                             // The avatar goes after the event tile as it's absolutly positioned to be over the
