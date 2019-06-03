@@ -95,6 +95,8 @@ module.exports = React.createClass({
 
         // Servers the RoomView can use to try and assist joins
         viaServers: PropTypes.arrayOf(PropTypes.string),
+
+        groupId: PropTypes.string,
     },
 
     getInitialState: function() {
@@ -1514,7 +1516,7 @@ module.exports = React.createClass({
         const TimelinePanel = sdk.getComponent("structures.TimelinePanel");
         const RoomUpgradeWarningBar = sdk.getComponent("rooms.RoomUpgradeWarningBar");
         const RoomRecoveryReminder = sdk.getComponent("rooms.RoomRecoveryReminder");
-
+        
         if (!this.state.room) {
             const loading = this.state.roomLoading || this.state.peekLoading;
             if (loading) {
@@ -1728,6 +1730,7 @@ module.exports = React.createClass({
         if (canSpeak) {
             messageComposer =
                 <MessageComposer
+                    groupId={this.props.groupId}
                     room={this.state.room}
                     callState={this.state.callState}
                     disabled={this.props.disabled}
