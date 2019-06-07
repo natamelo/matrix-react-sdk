@@ -67,6 +67,7 @@ const LoggedInView = React.createClass({
         viaServers: PropTypes.arrayOf(PropTypes.string),
 
         // and lots and lots of other stuff.
+        currentRoomId: PropTypes.string,
     },
 
     childContextTypes: {
@@ -90,6 +91,7 @@ const LoggedInView = React.createClass({
             useCompactLayout: SettingsStore.getValue('useCompactLayout'),
             // any currently active server notice events
             serverNoticeEvents: [],
+            currentGroupId: null,
         };
     },
 
@@ -102,6 +104,8 @@ const LoggedInView = React.createClass({
     componentWillMount: function() {
         // stash the MatrixClient in case we log out before we are unmounted
         this._matrixClient = this.props.matrixClient;
+
+        this._fetchGroupId();
 
         CallMediaHandler.loadDevices();
 
@@ -126,9 +130,11 @@ const LoggedInView = React.createClass({
             (prevProps.showCookieBar !== this.props.showCookieBar) ||
             (prevProps.hasNewVersion !== this.props.hasNewVersion) ||
             (prevProps.userHasGeneratedPassword !== this.props.userHasGeneratedPassword) ||
-            (prevProps.showNotifierToolbar !== this.props.showNotifierToolbar)
+            (prevProps.showNotifierToolbar !== this.props.showNotifierToolbar) ||
+            (prevProps.currentRoomId !== this.props.currentRoomId)
         ) {
             this.props.resizeNotifier.notifyBannersChanged();
+            return true;
         }
     },
 
@@ -430,6 +436,21 @@ const LoggedInView = React.createClass({
         this.resizeContainer = div;
     },
 
+    _fetchGroupId: function() {
+        const matrix = MatrixClientPeg.get();
+        matrix.getJoinedGroups().done((result) => {
+            for (const g of result.groups) {
+                matrix.getGroupRooms(g).done((gr) => {
+                    for (const room of gr.chunk) {
+                        if (room.room_id === this.props.currentRoomId) {
+                            this.setState({currentGroupId: g});
+                        }
+                    }
+                });
+            }
+        });
+    },
+
     render: function() {
         const LeftPanel = sdk.getComponent('structures.LeftPanel');
         const RoomView = sdk.getComponent('structures.RoomView');
@@ -448,7 +469,7 @@ const LoggedInView = React.createClass({
 
         switch (this.props.page_type) {
             case PageTypes.RoomView:
-                
+
                 pageElement = <RoomView
                         ref='roomView'
                         autoJoin={this.props.autoJoin}

@@ -310,6 +310,7 @@ module.exports = withMatrixClient(React.createClass({
             }
         }
         return true;
+        return true;
     },
 
     _checkSolicitation: function(event) {
@@ -701,7 +702,7 @@ module.exports = withMatrixClient(React.createClass({
         }
 
         var status = null;
-        if (content.status === 'Ciente') {
+        if (content.status === 'Ciente' || content.status === 'Autorizada') {
             status = <div className="mx_EventTile_Checked"> {content.status} </div>
         } else {
             status = <div className="mx_EventTile_Requested"> {content.status} </div>
@@ -800,6 +801,39 @@ module.exports = withMatrixClient(React.createClass({
                         </div>
                         <div className="mx_EventTile_line" >
                         { status }
+                        </div>
+                    </div>
+                );
+            }
+            case 'intervention': {
+                const EmojiText = sdk.getComponent('elements.EmojiText');
+                const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
+                return (
+                    <div>
+                        <div className={classes}>
+                            <div className="mx_EventTile_roomName">
+                                <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
+                                    { room ? room.name : '' }
+                                </EmojiText>
+                            </div>
+                            <div className="mx_EventTile_senderDetails">
+                                { avatar }
+                                <a href={permalink} onClick={this.onPermalinkClicked}>
+                                    { sender }
+                                    { timestamp }
+                                </a>
+                            </div>
+                            <div className="mx_EventTile_line" >
+                                <EventTileType ref="tile"
+                                               mxEvent={this.props.mxEvent}
+                                               highlights={this.props.highlights}
+                                               highlightLink={this.props.highlightLink}
+                                               showUrlPreview={this.props.showUrlPreview}
+                                               onHeightChanged={this.props.onHeightChanged} />
+                            </div>
+                            <div className="mx_EventTile_line" >
+                                { status }
+                            </div>
                         </div>
                     </div>
                 );

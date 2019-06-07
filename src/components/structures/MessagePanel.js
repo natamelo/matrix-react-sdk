@@ -383,7 +383,7 @@ module.exports = React.createClass({
                 if (eventTiles.length === 0) {
                     eventTiles = null;
                 }
-                
+
                 ret.push(<MemberEventListSummary key={key}
                     events={summarisedEvents}
                     onToggle={this._onHeightChanged} // Update scroll state
@@ -444,6 +444,8 @@ module.exports = React.createClass({
         this.currentReadMarkerEventId = readMarkerVisible ? this.props.readMarkerEventId : null;
         return ret;
     },
+
+    _startTime: '-',
 
     _getTilesForEvent: function(prevEvent, mxEv, last) {
         const EventTile = sdk.getComponent('rooms.EventTile');
@@ -510,6 +512,14 @@ module.exports = React.createClass({
         if (this.props.showReadReceipts) {
             readReceipts = this._getReadReceiptsForEvent(mxEv);
         }
+
+        if (this._startTime === '-') {
+            const date = mxEv.getDate();
+            const day = date.getDate() > 9 ? date.getDate() : '0' + date.getDate();
+            const month = (date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1);
+            this._startTime = day + '/' + month + '/' + date.getFullYear();
+        }
+
         ret.push(
                 <li key={eventId}
                         ref={this._collectEventNode.bind(this, eventId)}
@@ -677,6 +687,23 @@ module.exports = React.createClass({
         }
     },
 
+    getInformations: function() {
+        return <div>
+            <h2 className="mx_main_label">Informações</h2>
+            <div className="mx_intervention_data">
+                <div className="mx_larger_font">Programação</div>
+                <b>Inicio: </b> {this._startTime}
+                <br />
+                <b>Fim: </b>-
+                <br />
+                <div className="mx_larger_font">Execução</div>
+                <b>Inicio: </b>-
+                <br />
+                <b>Fim: </b>-
+            </div>
+        </div>;
+    },
+
     render: function() {
         const ScrollPanel = sdk.getComponent("structures.ScrollPanel");
         const WhoIsTypingTile = sdk.getComponent("rooms.WhoIsTypingTile");
@@ -709,20 +736,42 @@ module.exports = React.createClass({
             );
         }
 
-        return (
-            <ScrollPanel ref="scrollPanel" className={className}
-                    onScroll={this.props.onScroll}
-                    onResize={this.onResize}
-                    onFillRequest={this.props.onFillRequest}
-                    onUnfillRequest={this.props.onUnfillRequest}
-                    style={style}
-                    stickyBottom={this.props.stickyBottom}
-                    resizeNotifier={this.props.resizeNotifier}>
-                { topSpinner }
-                { this._getEventTiles() }
-                { whoIsTyping }
-                { bottomSpinner }
-            </ScrollPanel>
-        );
+        if (this.props.tileShape === 'intervention') {
+            const info = this.getInformations();
+            return (
+                <div>
+                    { info }
+                    <ScrollPanel ref="scrollPanel" className={className}
+                                 onScroll={this.props.onScroll}
+                                 onResize={this.onResize}
+                                 onFillRequest={this.props.onFillRequest}
+                                 onUnfillRequest={this.props.onUnfillRequest}
+                                 style={style}
+                                 stickyBottom={this.props.stickyBottom}
+                                 resizeNotifier={this.props.resizeNotifier}>
+                        { topSpinner }
+                        { this._getEventTiles() }
+                        { whoIsTyping }
+                        { bottomSpinner }
+                    </ScrollPanel>
+                </div>
+            );
+        } else {
+            return (
+                <ScrollPanel ref="scrollPanel" className={className}
+                             onScroll={this.props.onScroll}
+                             onResize={this.onResize}
+                             onFillRequest={this.props.onFillRequest}
+                             onUnfillRequest={this.props.onUnfillRequest}
+                             style={style}
+                             stickyBottom={this.props.stickyBottom}
+                             resizeNotifier={this.props.resizeNotifier}>
+                    { topSpinner }
+                    { this._getEventTiles() }
+                    { whoIsTyping }
+                    { bottomSpinner }
+                </ScrollPanel>
+            );
+        }
     },
 });

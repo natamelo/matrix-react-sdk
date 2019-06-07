@@ -36,24 +36,23 @@ const SolicitationPanel = React.createClass({
 
     render: function() {
         // wrap a TimelinePanel with the jump-to-event bits turned off.
-
         const TimelinePanel = sdk.getComponent("structures.TimelinePanel");
         const Loader = sdk.getComponent("elements.Spinner");
-        
+
         const timelineSet = MatrixClientPeg.get().getSolicitationTimelineSet();
 
-        if (timelineSet) {
+        if (timelineSet && !this.stillLoading) {
             return (
                 <TimelinePanel key={"SolicitationPanel_" + this.props.roomId}
-                    className="mx_NotificationPanel"
-                    manageReadReceipts={false}
-                    manageReadMarkers={false}
-                    timelineSet={timelineSet}
-                    showUrlPreview = {false}
-                    tileShape="solicitation"
-                    empty={_t('You have no solicitations')}
-                    showSolicitations={true}
-                    roomId={this.props.roomId}
+                               className="mx_NotificationPanel"
+                               manageReadReceipts={false}
+                               manageReadMarkers={false}
+                               timelineSet={timelineSet}
+                               showUrlPreview = {false}
+                               tileShape="solicitation"
+                               empty={_t('You have no solicitations')}
+                               showSolicitations={true}
+                               roomId={this.props.roomId}
                 />
             );
         } else {

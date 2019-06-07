@@ -110,7 +110,10 @@ var TimelinePanel = React.createClass({
 
         showSolicitations: PropTypes.bool,
 
+        showInterventions: PropTypes.bool,
+
         roomId: PropTypes.string,
+
     },
 
     statics: {
@@ -220,7 +223,6 @@ var TimelinePanel = React.createClass({
     },
 
     componentWillReceiveProps: function(newProps) {
-        
         if (newProps.timelineSet !== this.props.timelineSet) {
             // throw new Error("changing timelineSet on a TimelinePanel is not supported");
 
@@ -414,7 +416,7 @@ var TimelinePanel = React.createClass({
 
     onTimeLineUpdateEvent: function() {
         this._reloadEvents();
-        
+
         console.log("onTimeLineUpdateEvent! ");
     },
 
@@ -526,7 +528,7 @@ var TimelinePanel = React.createClass({
 
     onLocalEchoUpdated: function(ev, room, oldEventId) {
         if (this.unmounted) return;
-        
+
         // ignore events for other rooms
         if (room !== this.props.timelineSet.room) return;
 
@@ -579,7 +581,7 @@ var TimelinePanel = React.createClass({
             UserActivity.sharedInstance().timeWhileActiveRecently(this._readMarkerActivityTimer);
             try {
                 await this._readMarkerActivityTimer.finished();
-            } catch(e) { continue; /* aborted */ }
+            } catch (e) { continue; /* aborted */ }
             // outside of try/catch to not swallow errors
             this.updateReadMarker();
         }
@@ -591,7 +593,7 @@ var TimelinePanel = React.createClass({
             UserActivity.sharedInstance().timeWhileActiveNow(this._readReceiptActivityTimer);
             try {
                 await this._readReceiptActivityTimer.finished();
-            } catch(e) { continue; /* aborted */ }
+            } catch (e) { continue; /* aborted */ }
             // outside of try/catch to not swallow errors
             this.sendReadReceipt();
         }
@@ -944,15 +946,14 @@ var TimelinePanel = React.createClass({
      * returns a promise which will resolve when the load completes.
      */
     _loadTimeline: function(eventId, pixelOffset, offsetBase) {
-        
         this._timelineWindow = new Matrix.TimelineWindow(
             MatrixClientPeg.get(), this.props.timelineSet,
             {windowLimit: this.props.timelineCap,
             showSolicitations: this.props.showSolicitations,
-            roomId: this.props.roomId,});
+            showInterventions: this.props.showInterventions,
+            roomId: this.props.roomId});
 
         const onLoaded = () => {
-            
             // clear the timeline min-height when
             // (re)loading the timeline
             if (this.refs.messagePanel) {
@@ -1221,7 +1222,7 @@ var TimelinePanel = React.createClass({
             this.state.forwardPaginating ||
             ['PREPARED', 'CATCHUP'].includes(this.state.clientSyncState)
         );
-        
+
         return (
             <MessagePanel ref="messagePanel"
                           room={this.props.timelineSet.room}
