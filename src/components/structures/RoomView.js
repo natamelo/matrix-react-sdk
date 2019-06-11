@@ -1516,7 +1516,7 @@ module.exports = React.createClass({
         const TimelinePanel = sdk.getComponent("structures.TimelinePanel");
         const RoomUpgradeWarningBar = sdk.getComponent("rooms.RoomUpgradeWarningBar");
         const RoomRecoveryReminder = sdk.getComponent("rooms.RoomRecoveryReminder");
-        
+
         if (!this.state.room) {
             const loading = this.state.roomLoading || this.state.peekLoading;
             if (loading) {
@@ -1868,7 +1868,9 @@ module.exports = React.createClass({
         );
 
         const rightPanel = !hideRightPanel && this.state.room &&
-            <RightPanel roomId={this.state.room.roomId} resizeNotifier={this.props.resizeNotifier} />;
+            <RightPanel roomId={this.state.room.roomId}
+                        groupId={this.props.groupId}
+                        resizeNotifier={this.props.resizeNotifier} />;
         const collapsedRhs = hideRightPanel || this.props.collapsedRhs;
 
         return (
@@ -1876,6 +1878,7 @@ module.exports = React.createClass({
                 <RoomHeader ref="header" room={this.state.room} searchInfo={searchInfo}
                     oobData={this.props.oobData}
                     inRoom={myMembership === 'join'}
+                    groupId={this.props.groupId}
                     collapsedRhs={collapsedRhs}
                     onSearchClick={this.onSearchClick}
                     onSettingsClick={this.onSettingsClick}

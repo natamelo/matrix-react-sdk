@@ -26,3 +26,24 @@ limitations under the License.
     border-radius: 1px;
     width: 1px;
 }
+
+.mx_main_label {
+    color:#61708b;
+    padding-left: 16px
+}
+
+.mx_intervention_data {
+    background-color: white;
+    color: rgb(85, 93, 103);
+    padding: 0 0 18px 16px;
+}
+
+.mx_intervention_data b{
+    font-size: 15px;
+}
+
+.mx_larger_font {
+    font-size: 18px;
+    padding-top: 18px;
+    padding-bottom: 5px;
+}

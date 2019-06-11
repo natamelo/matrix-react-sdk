@@ -80,6 +80,10 @@ limitations under the License.
     mask-image: url('$(res)/img/feather-customised/solicitations.svg');
 }
 
+.mx_RightPanel_interventionsButton::before {
+    mask-image: url('$(res)/img/feather-customised/interventions.svg');
+}
+
 .mx_RightPanel_groupMembersButton::before {
     mask-image: url('$(res)/img/icons-people.svg');
 }

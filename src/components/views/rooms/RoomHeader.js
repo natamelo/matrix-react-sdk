@@ -38,6 +38,7 @@ module.exports = React.createClass({
 
     propTypes: {
         room: PropTypes.object,
+        groupId: PropTypes.string,
         oobData: PropTypes.object,
         inRoom: PropTypes.bool,
         collapsedRhs: PropTypes.bool,
@@ -306,7 +307,7 @@ module.exports = React.createClass({
                     { topicElement }
                     { cancelButton }
                     { rightRow }
-                    <RoomHeaderButtons collapsedRhs={this.props.collapsedRhs} />
+                    <RoomHeaderButtons collapsedRhs={this.props.collapsedRhs} room={this.props.room} />
                 </div>
             </div>
         );

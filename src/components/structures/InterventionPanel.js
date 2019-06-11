@@ -26,8 +26,8 @@ const dis = require("../../dispatcher");
 /*
  * Component which shows the solicitations
  */
-const SolicitationPanel = React.createClass({
-    displayName: 'SolicitationPanel',
+const InterventionPanel = React.createClass({
+    displayName: 'InterventionPanel',
 
     propTypes: {
         groupId: PropTypes.string,
@@ -36,12 +36,13 @@ const SolicitationPanel = React.createClass({
 
     render: function() {
         // wrap a TimelinePanel with the jump-to-event bits turned off.
+
         const TimelinePanel = sdk.getComponent("structures.TimelinePanel");
         const Loader = sdk.getComponent("elements.Spinner");
 
-        const timelineSet = MatrixClientPeg.get().getSolicitationTimelineSet();
+        const timelineSet = MatrixClientPeg.get().getInterventionTimelineSet();
 
-        if (timelineSet && !this.stillLoading) {
+        if (timelineSet) {
             return (
                 <TimelinePanel key={"SolicitationPanel_" + this.props.roomId}
                                className="mx_NotificationPanel"
@@ -49,14 +50,15 @@ const SolicitationPanel = React.createClass({
                                manageReadMarkers={false}
                                timelineSet={timelineSet}
                                showUrlPreview = {false}
-                               tileShape="solicitation"
-                               empty={_t('You have no solicitations')}
+                               tileShape="intervention"
+                               empty={_t('This room have no intervention')}
                                showSolicitations={true}
+                               showInterventions={true}
                                roomId={this.props.roomId}
                 />
             );
         } else {
-            console.error("No solicitationTimelineSet available!");
+            console.error("No interventionTimelineSet available!");
             return (
                 <div className="mx_SolicitationPanel">
                     <Loader />
@@ -66,4 +68,4 @@ const SolicitationPanel = React.createClass({
     },
 });
 
-module.exports = SolicitationPanel;
+module.exports = InterventionPanel;

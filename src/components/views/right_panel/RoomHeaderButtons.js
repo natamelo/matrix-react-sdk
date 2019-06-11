@@ -36,6 +36,7 @@ export default class RoomHeaderButtons extends HeaderButtons {
         this._onFilesClicked = this._onFilesClicked.bind(this);
         this._onNotificationsClicked = this._onNotificationsClicked.bind(this);
         this._onSolicitationsClicked = this._onSolicitationsClicked.bind(this);
+        this._onInterventionsClicked = this._onInterventionsClicked.bind(this);
     }
 
     onAction(payload) {
@@ -73,6 +74,10 @@ export default class RoomHeaderButtons extends HeaderButtons {
         this.togglePhase(RightPanel.Phase.SolicitationPanel);
     }
 
+    _onInterventionsClicked() {
+        this.togglePhase(RightPanel.Phase.InterventionPanel);
+    }
+
     renderButtons() {
         return [
             <HeaderButton key="solicitationsButton" name="solicitationsButton"
@@ -80,6 +85,12 @@ export default class RoomHeaderButtons extends HeaderButtons {
                 isHighlighted={this.isPhase(RightPanel.Phase.SolicitationPanel)}
                 onClick={this._onSolicitationsClicked}
                 analytics={['Right Panel', 'Solicitation List Button', 'click']}
+            />,
+            <HeaderButton key="interventionsButton" name="interventionsButton"
+                title={_t('Interventions')}
+                isHighlighted={this.isPhase(RightPanel.Phase.InterventionPanel)}
+                onClick={this._onInterventionsClicked}
+                analytics={['Right Panel', 'Intervention List Button', 'click']}
             />,
             <HeaderButton key="membersButton" name="membersButton"
                 title={_t('Members')}
