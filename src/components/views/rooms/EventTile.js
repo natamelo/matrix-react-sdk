@@ -289,8 +289,7 @@ module.exports = withMatrixClient(React.createClass({
                         return false;
                     }
                 }
-            }  else if (key === 'mxEvent') {
-
+            } else if (key === 'mxEvent') {
                 const rA = objA[key];
                 const rB = objB[key];
 
@@ -303,7 +302,7 @@ module.exports = withMatrixClient(React.createClass({
                     rB.event.content.status === 'Ciente') {
                     return false;
                 }
-            }  else {
+            } else {
                 if (objA[key] !== objB[key]) {
                     return false;
                 }
@@ -335,7 +334,6 @@ module.exports = withMatrixClient(React.createClass({
         }).catch((e) => {
             onSendMessageFailed(e, this.props.room);
         });
-
     },
 
     _cancelSolicitation: function(event) {
@@ -360,7 +358,6 @@ module.exports = withMatrixClient(React.createClass({
         }).catch((e) => {
             onSendMessageFailed(e, this.props.room);
         });
-
     },
 
     shouldHighlight: function() {
@@ -598,8 +595,11 @@ module.exports = withMatrixClient(React.createClass({
         const isRedacted = isMessageEvent(this.props.mxEvent) && this.props.isRedacted;
         const isEncryptionFailure = this.props.mxEvent.isDecryptionFailure();
 
+        const add_EventTileClass = this.props.tileShape !== 'solicitation' || content.status === 'Solicitada' ? true : false;
+
         const classes = classNames({
             mx_EventTile: true,
+            mx_EventTile_padding: add_EventTileClass,
             mx_EventTile_info: isInfoMessage,
             mx_EventTile_12hr: this.props.isTwelveHour,
             mx_EventTile_encrypting: this.props.eventSendStatus === 'encrypting',
@@ -683,7 +683,7 @@ module.exports = withMatrixClient(React.createClass({
             <span className="mx_EventTile_editButton" title={_t("Options")} onClick={this.onEditClicked} />
         );
 
-        var checkButton = null;
+        let checkButton = null;
 
         const isSolicitation = content && content.open_solicitation;
         const shouldShowInTimeLine = !this.props.tileShape || !this.props.tileShape.includes("solicitation");
@@ -701,11 +701,11 @@ module.exports = withMatrixClient(React.createClass({
             );
         }
 
-        var status = null;
-        if (content.status === 'Ciente' || content.status === 'Autorizada') {
-            status = <div className="mx_EventTile_Checked"> {content.status} </div>
+        let status = null;
+        if (content.status === 'Ciente' || content.status === 'Autorizada' || content.status === 'Concluida') {
+            status = <div className="mx_EventTile_Checked"> {content.status} </div>;
         } else {
-            status = <div className="mx_EventTile_Requested"> {content.status} </div>
+            status = <div className="mx_EventTile_Requested"> {content.status} </div>;
         }
 
         const timestamp = this.props.mxEvent.getTs() ?
@@ -777,31 +777,30 @@ module.exports = withMatrixClient(React.createClass({
             case 'solicitation': {
                 const EmojiText = sdk.getComponent('elements.EmojiText');
                 const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
+                const roomName = content.status === 'Solicitada' ?
+                    <div className="mx_EventTile_roomName">
+                        <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
+                            { room ? room.name : '' } - { content.solicitation_goal }
+                        </EmojiText>
+                    </div> :
+                    null;
                 return (
                     <div className={classes}>
-                        <div className="mx_EventTile_roomName">
-                            <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
-                                { room ? room.name : '' }
-                            </EmojiText>
-                        </div>
-                        <div className="mx_EventTile_senderDetails">
+                        { roomName }
+                        <div >
                             { avatar }
-                            <a href={permalink} onClick={this.onPermalinkClicked}>
-                                { sender }
-                                { timestamp }
+                            <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
+                                { status } por { sender } { timestamp }
                             </a>
                         </div>
-                        <div className="mx_EventTile_line" >
-                            <EventTileType ref="tile"
-                                           mxEvent={this.props.mxEvent}
-                                           highlights={this.props.highlights}
-                                           highlightLink={this.props.highlightLink}
-                                           showUrlPreview={this.props.showUrlPreview}
-                                           onHeightChanged={this.props.onHeightChanged} />
-                        </div>
-                        <div className="mx_EventTile_line" >
-                        { status }
-                        </div>
+                        {/*<div className="mx_EventTile_line" >*/}
+                        {/*    <EventTileType ref="tile"*/}
+                        {/*                   mxEvent={this.props.mxEvent}*/}
+                        {/*                   highlights={this.props.highlights}*/}
+                        {/*                   highlightLink={this.props.highlightLink}*/}
+                        {/*                   showUrlPreview={this.props.showUrlPreview}*/}
+                        {/*                   onHeightChanged={this.props.onHeightChanged} />*/}
+                        {/*</div>*/}
                     </div>
                 );
             }
