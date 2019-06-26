@@ -788,7 +788,6 @@ module.exports = withMatrixClient(React.createClass({
                     <div className={classes}>
                         { roomName }
                         <div >
-                            { avatar }
                             <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
                                 { status } por { sender } { timestamp }
                             </a>

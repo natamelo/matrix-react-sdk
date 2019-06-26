@@ -330,7 +330,7 @@ module.exports = React.createClass({
                 // membership event, which will not change during forward pagination.
                 const key = "membereventlistsummary-" + (prevEvent ? mxEv.getId() : "initial");
 
-                if (this._wantsDateSeparator(prevEvent, mxEv.getDate())) {
+                if (this._wantsDateSeparator(prevEvent, mxEv.getDate()) && this.props.tileShape !== 'solicitation') {
                     const dateSeparator = <li key={ts1+'~'}><DateSeparator key={ts1+'~'} ts={ts1} /></li>;
                     ret.push(dateSeparator);
                 }
@@ -495,7 +495,7 @@ module.exports = React.createClass({
         }
 
         // do we need a date separator since the last event?
-        if (this._wantsDateSeparator(prevEvent, eventDate)) {
+        if (this._wantsDateSeparator(prevEvent, eventDate) && this.props.tileShape !== 'solicitation') {
             const dateSeparator = <li key={ts1}><DateSeparator key={ts1} ts={ts1} /></li>;
             ret.push(dateSeparator);
             continuation = false;
