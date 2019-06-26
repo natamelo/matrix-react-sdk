@@ -26,7 +26,13 @@ limitations under the License.
 }
 
 .mx_EventTile_noDecoration {
+
+    font-size: 12px;
     text-decoration: none;
+}
+
+a.mx_EventTile_noDecoration {
+    color: #2e2f32;
 }
 
 .mx_EventTile.mx_EventTile_info {

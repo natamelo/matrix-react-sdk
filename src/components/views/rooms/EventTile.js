@@ -561,6 +561,13 @@ module.exports = withMatrixClient(React.createClass({
         return null;
     },
 
+    _getDateString(date) {
+        const day = date.getDate() > 9 ? date.getDate().toString() : '0' + date.getDate().toString();
+        const month = date.getMonth() > 8 ? (date.getMonth + 1).toString() : '0' + (date.getMonth() + 1).toString();
+
+        return day + '/' + month;
+    },
+
     render: function() {
         const MessageTimestamp = sdk.getComponent('messages.MessageTimestamp');
         const SenderProfile = sdk.getComponent('messages.SenderProfile');
@@ -777,6 +784,8 @@ module.exports = withMatrixClient(React.createClass({
             case 'solicitation': {
                 const EmojiText = sdk.getComponent('elements.EmojiText');
                 const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
+                const date = new Date(this.props.mxEvent.getTs());
+
                 const roomName = content.status === 'Solicitada' ?
                     <div className="mx_EventTile_roomName">
                         <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
@@ -789,7 +798,7 @@ module.exports = withMatrixClient(React.createClass({
                         { roomName }
                         <div >
                             <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
-                                { status } por { sender } { timestamp }
+                                { status } por { sender } em { this._getDateString(date) } às { timestamp }
                             </a>
                         </div>
                         {/*<div className="mx_EventTile_line" >*/}
