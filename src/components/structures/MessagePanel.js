@@ -256,9 +256,48 @@ module.exports = React.createClass({
         return !shouldHideEvent(mxEv);
     },
 
+    _getSortedSolicitations: function() {
+        let order = [];
+        let grouped_events = [];
+        let events = [];
+
+        for (let i = this.props.events.length-1; i >= 0; i--) {
+            const mxEv = this.props.events[i].getContent();
+            if (mxEv && mxEv.solicitation_number) {
+                const atual_number = parseInt(mxEv.solicitation_number);
+                if (!order.includes(atual_number)) {order.push(atual_number);}
+            }
+        }
+
+        for (let item of order) {
+            grouped_events.push([]);
+        }
+
+        for (let i = this.props.events.length-1; i >= 0; i--) {
+            const mxEv = this.props.events[i].getContent();
+            if (mxEv && mxEv.solicitation_number) {
+                const atual_number = parseInt(mxEv.solicitation_number);
+                grouped_events[order.indexOf(atual_number)].push(this.props.events[i]);
+            }
+        }
+
+        for (let i = grouped_events.length - 1; i > -1; i--) {
+            events = events.concat(grouped_events[i].reverse());
+        }
+
+        return events;
+    },
+
     _getEventTiles: function() {
         const DateSeparator = sdk.getComponent('messages.DateSeparator');
         const MemberEventListSummary = sdk.getComponent('views.elements.MemberEventListSummary');
+        let events;
+
+        if (this.props.tileShape === 'solicitation') {
+            events = this._getSortedSolicitations();
+        } else {
+            events = this.props.events;
+        }
 
         this.eventNodes = {};
 
@@ -274,8 +313,10 @@ module.exports = React.createClass({
         let lastShownEvent;
 
         let lastShownNonLocalEchoIndex = -1;
-        for (i = this.props.events.length-1; i >= 0; i--) {
-            const mxEv = this.props.events[i];
+        for (i = events.length-1; i >= 0; i--) {
+
+            const mxEv = events[i];
+
             if (!this._shouldShowEvent(mxEv)) {
                 continue;
             }
@@ -309,8 +350,8 @@ module.exports = React.createClass({
 
         const isMembershipChange = (e) => e.getType() === 'm.room.member';
 
-        for (i = 0; i < this.props.events.length; i++) {
-            const mxEv = this.props.events[i];
+        for (i = 0; i < events.length; i++) {
+            const mxEv = events[i];
             const eventId = mxEv.getId();
             const last = (mxEv === lastShownEvent);
 
@@ -341,8 +382,8 @@ module.exports = React.createClass({
                 }
 
                 const summarisedEvents = [mxEv];
-                for (;i + 1 < this.props.events.length; i++) {
-                    const collapsedMxEv = this.props.events[i + 1];
+                for (;i + 1 < events.length; i++) {
+                    const collapsedMxEv = events[i + 1];
 
                     // Ignore redacted/hidden member events
                     if (!this._shouldShowEvent(collapsedMxEv)) {
