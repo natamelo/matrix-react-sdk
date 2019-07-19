@@ -785,11 +785,12 @@ module.exports = withMatrixClient(React.createClass({
                 const EmojiText = sdk.getComponent('elements.EmojiText');
                 const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
                 const date = new Date(this.props.mxEvent.getTs());
+                const text = (room ? room.name : '') + ' - ' + content.solicitation_goal;
 
                 const roomName = content.status === 'Solicitada' ?
                     <div className="mx_EventTile_roomName">
                         <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
-                            { room ? room.name : '' } - { content.solicitation_goal }
+                            { text }
                         </EmojiText>
                     </div> :
                     null;
@@ -801,14 +802,6 @@ module.exports = withMatrixClient(React.createClass({
                                 { status } por { sender } em { this._getDateString(date) } às { timestamp }
                             </a>
                         </div>
-                        {/*<div className="mx_EventTile_line" >*/}
-                        {/*    <EventTileType ref="tile"*/}
-                        {/*                   mxEvent={this.props.mxEvent}*/}
-                        {/*                   highlights={this.props.highlights}*/}
-                        {/*                   highlightLink={this.props.highlightLink}*/}
-                        {/*                   showUrlPreview={this.props.showUrlPreview}*/}
-                        {/*                   onHeightChanged={this.props.onHeightChanged} />*/}
-                        {/*</div>*/}
                     </div>
                 );
             }
@@ -909,6 +902,7 @@ module.exports = withMatrixClient(React.createClass({
                     this.props.permalinkCreator,
                     'replyThread',
                 );
+                if (content.atual_status === 'Soliciatada') {checkButton = null;}
                 return (
                     <div className={classes}>
                         <div className="mx_EventTile_msgOption">

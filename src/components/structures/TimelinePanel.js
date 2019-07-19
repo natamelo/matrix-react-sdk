@@ -108,8 +108,10 @@ var TimelinePanel = React.createClass({
         // placeholder text to use if the timeline is empty
         empty: PropTypes.string,
 
+        // should show solicitation events ?
         showSolicitations: PropTypes.bool,
 
+        // should show intervention events ?
         showInterventions: PropTypes.bool,
 
         roomId: PropTypes.string,
@@ -238,7 +240,7 @@ var TimelinePanel = React.createClass({
             console.warn("Replacing timelineSet on a TimelinePanel - confusion may ensue");
         }
 
-        if (newProps.eventId != this.props.eventId) {
+        if (newProps.eventId !== this.props.eventId) {
             console.log("TimelinePanel switching to eventId " + newProps.eventId +
                         " (was " + this.props.eventId + ")");
             return this._initTimeline(newProps);
@@ -1072,7 +1074,6 @@ var TimelinePanel = React.createClass({
         if (!this._timelineWindow.canPaginate(EventTimeline.FORWARDS)) {
             events.push(...this.props.timelineSet.getPendingEvents());
         }
-
         return events;
     },
 
