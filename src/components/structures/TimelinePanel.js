@@ -36,8 +36,8 @@ const UserActivity = require("../../UserActivity");
 import { KeyCode } from '../../Keyboard';
 import Timer from '../../utils/Timer';
 
-const PAGINATE_SIZE = 20;
-const INITIAL_SIZE = 20;
+const PAGINATE_SIZE = 30;
+const INITIAL_SIZE = 30;
 const READ_MARKER_INVIEW_THRESHOLD_MS = 1 * 1000;
 const READ_MARKER_OUTOFVIEW_THRESHOLD_MS = 30 * 1000;
 const READ_RECEIPT_INTERVAL_MS = 500;
