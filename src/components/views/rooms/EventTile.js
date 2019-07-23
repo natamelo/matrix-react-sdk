@@ -299,7 +299,7 @@ module.exports = withMatrixClient(React.createClass({
 
                 if (rA && rB && rA.event && rB.event &&
                     rA.event.content && rB.event.content &&
-                    rB.event.content.status === 'Ciente') {
+                    rA.event.content.atual_status !== rB.event.content.atual_status) {
                     return false;
                 }
             } else {
@@ -308,7 +308,6 @@ module.exports = withMatrixClient(React.createClass({
                 }
             }
         }
-        return true;
         return true;
     },
 
@@ -331,6 +330,7 @@ module.exports = withMatrixClient(React.createClass({
             dis.dispatch({
                 action: 'message_sent',
             });
+            this.forceUpdate();
         }).catch((e) => {
             onSendMessageFailed(e, this.props.room);
         });
