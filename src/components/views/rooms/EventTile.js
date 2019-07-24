@@ -606,7 +606,6 @@ module.exports = withMatrixClient(React.createClass({
 
         const classes = classNames({
             mx_EventTile: true,
-            mx_EventTile_padding: add_EventTileClass,
             mx_EventTile_info: isInfoMessage,
             mx_EventTile_12hr: this.props.isTwelveHour,
             mx_EventTile_encrypting: this.props.eventSendStatus === 'encrypting',
@@ -787,19 +786,19 @@ module.exports = withMatrixClient(React.createClass({
                 const date = new Date(this.props.mxEvent.getTs());
                 const text = (room ? room.name : '') + ' - ' + content.solicitation_goal;
 
-                const roomName = content.status === 'Solicitada' ?
-                    <div className="mx_EventTile_roomName">
-                        <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
+                const roomName =
+                    <div className="mx_eventTile_solicitation_title">
+                        <EmojiText element="b" href={permalink} onClick={this.onPermalinkClicked}>
                             { text }
                         </EmojiText>
-                    </div> :
-                    null;
+                    </div>;
                 return (
                     <div className={classes}>
                         { roomName }
-                        <div >
+                        <div>
                             <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
-                                { status } por { sender } em { this._getDateString(date) } às { timestamp }
+                                Iniciado em { this._getDateString(date) } às { timestamp } <br />
+                                Status: { status }
                             </a>
                         </div>
                     </div>
