@@ -299,7 +299,8 @@ module.exports = withMatrixClient(React.createClass({
 
                 if (rA && rB && rA.event && rB.event &&
                     rA.event.content && rB.event.content &&
-                    rA.event.content.status !== rB.event.content.status) {
+                    (rB.event.content.status === 'Ciente' ||
+                     rB.event.content.status === 'Cancelada')) {
                     return false;
                 }
             } else {
@@ -901,7 +902,7 @@ module.exports = withMatrixClient(React.createClass({
                     this.props.permalinkCreator,
                     'replyThread',
                 );
-                if (content.status !== 'Soliciatada') {checkButton = null;}
+                if (content.status !== 'Solicitada') {checkButton = null;}
                 return (
                     <div className={classes}>
                         <div className="mx_EventTile_msgOption">

@@ -291,13 +291,7 @@ module.exports = React.createClass({
     _getEventTiles: function() {
         const DateSeparator = sdk.getComponent('messages.DateSeparator');
         const MemberEventListSummary = sdk.getComponent('views.elements.MemberEventListSummary');
-        let events;
-
-        if (this.props.tileShape === 'solicitation') {
-            events = this._getSortedSolicitations();
-        } else {
-            events = this.props.events;
-        }
+        const events = this.props.events;
 
         this.eventNodes = {};
 
