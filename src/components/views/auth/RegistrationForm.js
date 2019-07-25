@@ -447,6 +447,9 @@ module.exports = React.createClass({
                 <div className="mx_TypeDropdown_option" key="ONS">
                     ONS
                 </div>
+                <div className="mx_TypeDropdown_option" key="SUBESTACAO">
+                    SUBESTAÇÃO
+                </div>
             </Dropdown>
         );
 
