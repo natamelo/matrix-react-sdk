@@ -257,41 +257,40 @@ module.exports = React.createClass({
     },
 
     _getSortedSolicitations: function() {
-        let order = [];
-        let grouped_events = [];
+        const order = [[], [], []];
         let events = [];
 
         for (let i = this.props.events.length-1; i >= 0; i--) {
             const mxEv = this.props.events[i].getContent();
-            if (mxEv && mxEv.solicitation_number) {
-                const atual_number = parseInt(mxEv.solicitation_number);
-                if (!order.includes(atual_number)) {order.push(atual_number);}
+            if (mxEv && mxEv.status) {
+                const status = mxEv.status;
+                if (status.toLowerCase() === 'solicitada') {
+                    order[0].push(this.props.events[i]);
+                } else if (status.toLowerCase() === 'ciente') {
+                    order[1].push(this.props.events[i]);
+                } else {
+                   order[2].push(this.props.events[i]);
+                }
             }
         }
 
-        for (let item of order) {
-            grouped_events.push([]);
+        for (const group of order) {
+            events = events.concat(group);
         }
 
-        for (let i = this.props.events.length-1; i >= 0; i--) {
-            const mxEv = this.props.events[i].getContent();
-            if (mxEv && mxEv.solicitation_number) {
-                const atual_number = parseInt(mxEv.solicitation_number);
-                grouped_events[order.indexOf(atual_number)].push(this.props.events[i]);
-            }
-        }
-
-        for (let i = grouped_events.length - 1; i >= 0; i--) {
-            events = events.concat(grouped_events[i].reverse());
-        }
-
-        return events;
+        return events.reverse();
     },
 
     _getEventTiles: function() {
         const DateSeparator = sdk.getComponent('messages.DateSeparator');
         const MemberEventListSummary = sdk.getComponent('views.elements.MemberEventListSummary');
-        const events = this.props.events;
+        let events;
+
+        if (this.props.tileShape === 'solicitation') {
+            events = this._getSortedSolicitations();
+        } else {
+            events = this.props.events;
+        }
 
         this.eventNodes = {};
 
@@ -308,7 +307,6 @@ module.exports = React.createClass({
 
         let lastShownNonLocalEchoIndex = -1;
         for (i = events.length-1; i >= 0; i--) {
-
             const mxEv = events[i];
 
             if (!this._shouldShowEvent(mxEv)) {

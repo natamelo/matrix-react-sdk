@@ -710,9 +710,9 @@ module.exports = withMatrixClient(React.createClass({
 
         let status = null;
         if (content.status === 'Ciente' || content.status === 'Autorizada' || content.status === 'Concluida') {
-            status = <div className="mx_EventTile_Checked"> {content.status} </div>;
+            status = <div className="mx_EventTile_Checked"> {content.status.toUpperCase()} </div>;
         } else {
-            status = <div className="mx_EventTile_Requested"> {content.status} </div>;
+            status = <div className="mx_EventTile_Requested"> {content.status.toUpperCase()} </div>;
         }
 
         const timestamp = this.props.mxEvent.getTs() ?
@@ -794,13 +794,15 @@ module.exports = withMatrixClient(React.createClass({
                         </EmojiText>
                     </div>;
                 return (
-                    <div className={classes}>
-                        { roomName }
-                        <div>
-                            <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
-                                Iniciado em { this._getDateString(date) } às { timestamp } <br />
-                                Status: { status }
-                            </a>
+                    <div className="mx_EventTile_padding">
+                        <div className={classes}>
+                            { roomName }
+                            <div>
+                                <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
+                                    Iniciado em { this._getDateString(date) } às { timestamp } <br />
+                                    Status: { status }
+                                </a>
+                            </div>
                         </div>
                     </div>
                 );
