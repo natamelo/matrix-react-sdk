@@ -810,7 +810,10 @@ module.exports = React.createClass({
             return;
         }
         this.clearPreventShrinking();
-        const offsetFromBottom = messageList.clientHeight - (lastTileNode.clientHeight);
+        let offsetFromBottom = messageList.clientHeight - (lastTileNode.offsetTop + lastTileNode.clientHeight);
+        if (this.props.tileShape === 'solicitation') {
+            offsetFromBottom = 0;
+        }
         this.preventShrinkingState = {
             offsetFromBottom: offsetFromBottom,
             offsetNode: lastTileNode,
