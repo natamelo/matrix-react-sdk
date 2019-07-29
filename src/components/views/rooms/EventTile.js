@@ -603,8 +603,6 @@ module.exports = withMatrixClient(React.createClass({
         const isRedacted = isMessageEvent(this.props.mxEvent) && this.props.isRedacted;
         const isEncryptionFailure = this.props.mxEvent.isDecryptionFailure();
 
-        const add_EventTileClass = this.props.tileShape !== 'solicitation' || content.status === 'Solicitada' ? true : false;
-
         const classes = classNames({
             mx_EventTile: true,
             mx_EventTile_info: isInfoMessage,
@@ -709,10 +707,12 @@ module.exports = withMatrixClient(React.createClass({
         }
 
         let status = null;
-        if (content.status === 'Ciente' || content.status === 'Autorizada' || content.status === 'Concluida') {
-            status = <div className="mx_EventTile_Checked"> {content.status.toUpperCase()} </div>;
-        } else {
-            status = <div className="mx_EventTile_Requested"> {content.status.toUpperCase()} </div>;
+        if (content && content.status) {
+            if (content.status === 'Ciente' || content.status === 'Autorizada' || content.status === 'Concluida') {
+                status = <div className="mx_EventTile_Checked"> {content.status.toUpperCase()} </div>;
+            } else {
+                status = <div className="mx_EventTile_Requested"> {content.status.toUpperCase()} </div>;
+            }
         }
 
         const timestamp = this.props.mxEvent.getTs() ?
