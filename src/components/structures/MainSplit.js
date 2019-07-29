@@ -48,7 +48,7 @@ export default class MainSplit extends React.Component {
         if (rhsSize !== null) {
             rhsSize = parseInt(rhsSize, 10);
         } else {
-            rhsSize = 350;
+            rhsSize = 230;
         }
         resizer.forHandleAt(0).resize(rhsSize);
 

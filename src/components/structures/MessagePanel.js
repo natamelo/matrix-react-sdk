@@ -278,7 +278,7 @@ module.exports = React.createClass({
             events = events.concat(group);
         }
 
-        return events.reverse();
+        return events;
     },
 
     _getEventTiles: function() {
@@ -774,6 +774,23 @@ module.exports = React.createClass({
                         { bottomSpinner }
                     </ScrollPanel>
                 </div>
+            );
+        } else if (this.props.tileShape === 'solicitation') {
+            return (
+                <ScrollPanel ref="scrollPanel" className={className}
+                             onScroll={this.props.onScroll}
+                             onResize={this.onResize}
+                             onFillRequest={this.props.onFillRequest}
+                             onUnfillRequest={this.props.onUnfillRequest}
+                             style={style}
+                             stickyBottom={false}
+                             startAtBottom={false}
+                             resizeNotifier={this.props.resizeNotifier}>
+                    { topSpinner }
+                    { this._getEventTiles() }
+                    { whoIsTyping }
+                    { bottomSpinner }
+                </ScrollPanel>
             );
         } else {
             return (
