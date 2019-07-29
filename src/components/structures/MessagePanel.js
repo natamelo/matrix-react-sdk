@@ -766,6 +766,7 @@ module.exports = React.createClass({
                                  onFillRequest={this.props.onFillRequest}
                                  onUnfillRequest={this.props.onUnfillRequest}
                                  style={style}
+                                 tileShape={this.props.tileShape}
                                  stickyBottom={this.props.stickyBottom}
                                  resizeNotifier={this.props.resizeNotifier}>
                         { topSpinner }
@@ -783,6 +784,7 @@ module.exports = React.createClass({
                              onFillRequest={this.props.onFillRequest}
                              onUnfillRequest={this.props.onUnfillRequest}
                              style={style}
+                             tileShape={this.props.tileShape}
                              stickyBottom={false}
                              startAtBottom={false}
                              resizeNotifier={this.props.resizeNotifier}>
@@ -800,6 +802,7 @@ module.exports = React.createClass({
                              onFillRequest={this.props.onFillRequest}
                              onUnfillRequest={this.props.onUnfillRequest}
                              style={style}
+                             tileShape={this.props.tileShape}
                              stickyBottom={this.props.stickyBottom}
                              resizeNotifier={this.props.resizeNotifier}>
                     { topSpinner }

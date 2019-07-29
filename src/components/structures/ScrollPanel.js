@@ -144,6 +144,8 @@ module.exports = React.createClass({
         /* resizeNotifier: ResizeNotifier to know when middle column has changed size
          */
         resizeNotifier: PropTypes.object,
+
+        tileShape: PropTypes.string,
     },
 
     getDefaultProps: function() {
@@ -170,6 +172,10 @@ module.exports = React.createClass({
 
     componentDidMount: function() {
         this.checkScroll();
+
+        if (this.props.tileShape === 'solicitation') {
+            this.scrollToTop();
+        }
     },
 
     componentDidUpdate: function() {
@@ -804,7 +810,7 @@ module.exports = React.createClass({
             return;
         }
         this.clearPreventShrinking();
-        const offsetFromBottom = messageList.clientHeight - (lastTileNode.offsetTop + lastTileNode.clientHeight);
+        const offsetFromBottom = messageList.clientHeight - (lastTileNode.clientHeight);
         this.preventShrinkingState = {
             offsetFromBottom: offsetFromBottom,
             offsetNode: lastTileNode,
