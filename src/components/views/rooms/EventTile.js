@@ -374,7 +374,19 @@ module.exports = withMatrixClient(React.createClass({
     },
 
     onEditClicked: function(e) {
-        const MessageContextMenu = sdk.getComponent('context_menus.MessageContextMenu');
+        const userType = localStorage.getItem('mx_user_type');
+        const status = this.props.mxEvent.getContent().status;
+
+        const isSubestacaoUser = userType === 'subestacao';
+        const isPerturbacaoInterna = status === 'PERTURBACAO_INTERNA_INFORMADA';
+        
+        var MessageContextMenu = null;
+        if (isSubestacaoUser && isPerturbacaoInterna) {
+            MessageContextMenu = sdk.getComponent('context_menus.InternalDisturbanceContextMenu');
+        } else{
+            MessageContextMenu = sdk.getComponent('context_menus.MessageContextMenu');     
+        }
+        
         const buttonRect = e.target.getBoundingClientRect();
 
         // The window X and Y offsets are to adjust position when zoomed in to page
@@ -695,6 +707,7 @@ module.exports = withMatrixClient(React.createClass({
         const userType = localStorage.getItem('mx_user_type');
         const isCteepUser = userType === 'cteep';
         const isOnsUser = userType === 'ons';
+        const isSubestacaoUser = userType === 'subestacao';
 
         if (shouldShowInTimeLine && isSolicitation && isCteepUser) {
             checkButton = (
@@ -704,6 +717,8 @@ module.exports = withMatrixClient(React.createClass({
             checkButton = (
                 <span className="mx_EventTile_checkButton red" onClick={this.onCancelClicked}>  {_t("Cancel")} </span>
             );
+        } else if (isSubestacaoUser) {
+            console.log(content);  
         }
 
         let status = null;
