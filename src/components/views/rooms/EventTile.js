@@ -289,8 +289,7 @@ module.exports = withMatrixClient(React.createClass({
                         return false;
                     }
                 }
-            }  else if (key === 'mxEvent') {
-
+            } else if (key === 'mxEvent') {
                 const rA = objA[key];
                 const rB = objB[key];
 
@@ -300,16 +299,16 @@ module.exports = withMatrixClient(React.createClass({
 
                 if (rA && rB && rA.event && rB.event &&
                     rA.event.content && rB.event.content &&
-                    rB.event.content.status === 'Ciente') {
+                    (rB.event.content.status === 'Ciente' ||
+                     rB.event.content.status === 'Cancelada')) {
                     return false;
                 }
-            }  else {
+            } else {
                 if (objA[key] !== objB[key]) {
                     return false;
                 }
             }
         }
-        return true;
         return true;
     },
 
@@ -332,10 +331,10 @@ module.exports = withMatrixClient(React.createClass({
             dis.dispatch({
                 action: 'message_sent',
             });
+            this.forceUpdate();
         }).catch((e) => {
             onSendMessageFailed(e, this.props.room);
         });
-
     },
 
     _cancelSolicitation: function(event) {
@@ -360,7 +359,6 @@ module.exports = withMatrixClient(React.createClass({
         }).catch((e) => {
             onSendMessageFailed(e, this.props.room);
         });
-
     },
 
     shouldHighlight: function() {
@@ -564,6 +562,13 @@ module.exports = withMatrixClient(React.createClass({
         return null;
     },
 
+    _getDateString(date) {
+        const day = date.getDate() > 9 ? date.getDate().toString() : '0' + date.getDate().toString();
+        const month = date.getMonth() > 8 ? (date.getMonth + 1).toString() : '0' + (date.getMonth() + 1).toString();
+
+        return day + '/' + month;
+    },
+
     render: function() {
         const MessageTimestamp = sdk.getComponent('messages.MessageTimestamp');
         const SenderProfile = sdk.getComponent('messages.SenderProfile');
@@ -597,6 +602,8 @@ module.exports = withMatrixClient(React.createClass({
         const isSending = (['sending', 'queued', 'encrypting'].indexOf(this.props.eventSendStatus) !== -1);
         const isRedacted = isMessageEvent(this.props.mxEvent) && this.props.isRedacted;
         const isEncryptionFailure = this.props.mxEvent.isDecryptionFailure();
+
+        const add_EventTileClass = this.props.tileShape !== 'solicitation' || content.status === 'Solicitada' ? true : false;
 
         const classes = classNames({
             mx_EventTile: true,
@@ -683,7 +690,7 @@ module.exports = withMatrixClient(React.createClass({
             <span className="mx_EventTile_editButton" title={_t("Options")} onClick={this.onEditClicked} />
         );
 
-        var checkButton = null;
+        let checkButton = null;
 
         const isSolicitation = content && content.open_solicitation;
         const shouldShowInTimeLine = !this.props.tileShape || !this.props.tileShape.includes("solicitation");
@@ -701,11 +708,11 @@ module.exports = withMatrixClient(React.createClass({
             );
         }
 
-        var status = null;
-        if (content.status === 'Ciente' || content.status === 'Autorizada') {
-            status = <div className="mx_EventTile_Checked"> {content.status} </div>
+        let status = null;
+        if (content.status === 'Ciente' || content.status === 'Autorizada' || content.status === 'Concluida') {
+            status = <div className="mx_EventTile_Checked"> {content.status.toUpperCase()} </div>;
         } else {
-            status = <div className="mx_EventTile_Requested"> {content.status} </div>
+            status = <div className="mx_EventTile_Requested"> {content.status.toUpperCase()} </div>;
         }
 
         const timestamp = this.props.mxEvent.getTs() ?
@@ -777,30 +784,25 @@ module.exports = withMatrixClient(React.createClass({
             case 'solicitation': {
                 const EmojiText = sdk.getComponent('elements.EmojiText');
                 const room = this.props.matrixClient.getRoom(this.props.mxEvent.getRoomId());
+                const date = new Date(this.props.mxEvent.getTs());
+                const text = (room ? room.name : '') + ' - ' + content.solicitation_goal;
+
+                const roomName =
+                    <div className="mx_eventTile_solicitation_title">
+                        <EmojiText element="b" href={permalink} onClick={this.onPermalinkClicked}>
+                            { text }
+                        </EmojiText>
+                    </div>;
                 return (
-                    <div className={classes}>
-                        <div className="mx_EventTile_roomName">
-                            <EmojiText element="a" href={permalink} onClick={this.onPermalinkClicked}>
-                                { room ? room.name : '' }
-                            </EmojiText>
-                        </div>
-                        <div className="mx_EventTile_senderDetails">
-                            { avatar }
-                            <a href={permalink} onClick={this.onPermalinkClicked}>
-                                { sender }
-                                { timestamp }
-                            </a>
-                        </div>
-                        <div className="mx_EventTile_line" >
-                            <EventTileType ref="tile"
-                                           mxEvent={this.props.mxEvent}
-                                           highlights={this.props.highlights}
-                                           highlightLink={this.props.highlightLink}
-                                           showUrlPreview={this.props.showUrlPreview}
-                                           onHeightChanged={this.props.onHeightChanged} />
-                        </div>
-                        <div className="mx_EventTile_line" >
-                        { status }
+                    <div className="mx_EventTile_padding">
+                        <div className={classes}>
+                            { roomName }
+                            <div>
+                                <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
+                                    Iniciado em { this._getDateString(date) } às { timestamp } <br />
+                                    Status: { status }
+                                </a>
+                            </div>
                         </div>
                     </div>
                 );
@@ -902,6 +904,7 @@ module.exports = withMatrixClient(React.createClass({
                     this.props.permalinkCreator,
                     'replyThread',
                 );
+                if (content.status !== 'Solicitada') {checkButton = null;}
                 return (
                     <div className={classes}>
                         <div className="mx_EventTile_msgOption">

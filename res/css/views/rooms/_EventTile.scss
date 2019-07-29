@@ -17,9 +17,28 @@ limitations under the License.
 .mx_EventTile {
     max-width: 100%;
     clear: both;
-    padding-top: 18px;
     font-size: 14px;
     position: relative;
+}
+
+.mx_EventTile_padding {
+    padding-top: 10px;
+}
+
+.mx_EventTile_noDecoration {
+    font-size: 14px;
+    text-decoration: none;
+}
+
+a.mx_EventTile_noDecoration {
+    color: #2e2f32;
+}
+
+a.mx_eventTile_solicitation_title {
+    font-size: 16px;
+    font-weight: bolder;
+    color: #2e2f32;
+    text-decoration: none;
 }
 
 .mx_EventTile.mx_EventTile_info {
@@ -148,6 +167,10 @@ limitations under the License.
     color: $event-sending-color;
 }
 
+.mx_EventTile_font {
+    font-size: 14px;
+}
+
 .mx_EventTile_sending .mx_UserPill,
 .mx_EventTile_sending .mx_RoomPill,
 .mx_EventTile_sending .mx_emojione {
@@ -221,10 +244,12 @@ limitations under the License.
 
 .mx_EventTile_Checked {
     color: #03b381;
+    display: inline;
 }
 
 .mx_EventTile_Requested {
     color: #FF0000;
+    display: inline;
 }
 
 .mx_EventTile_checkButton {
@@ -265,7 +290,7 @@ limitations under the License.
 }
 
 .mx_EventTile:hover .mx_EventTile_editButton,
-.mx_EventTile_checkButton, 
+.mx_EventTile_checkButton,
 .mx_EventTile.menu .mx_EventTile_editButton {
     visibility: visible;
 }

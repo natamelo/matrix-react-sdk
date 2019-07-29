@@ -256,9 +256,41 @@ module.exports = React.createClass({
         return !shouldHideEvent(mxEv);
     },
 
+    _getSortedSolicitations: function() {
+        const order = [[], [], []];
+        let events = [];
+
+        for (let i = this.props.events.length-1; i >= 0; i--) {
+            const mxEv = this.props.events[i].getContent();
+            if (mxEv && mxEv.status) {
+                const status = mxEv.status;
+                if (status.toLowerCase() === 'solicitada') {
+                    order[0].push(this.props.events[i]);
+                } else if (status.toLowerCase() === 'ciente') {
+                    order[1].push(this.props.events[i]);
+                } else {
+                   order[2].push(this.props.events[i]);
+                }
+            }
+        }
+
+        for (const group of order) {
+            events = events.concat(group);
+        }
+
+        return events.reverse();
+    },
+
     _getEventTiles: function() {
         const DateSeparator = sdk.getComponent('messages.DateSeparator');
         const MemberEventListSummary = sdk.getComponent('views.elements.MemberEventListSummary');
+        let events;
+
+        if (this.props.tileShape === 'solicitation') {
+            events = this._getSortedSolicitations();
+        } else {
+            events = this.props.events;
+        }
 
         this.eventNodes = {};
 
@@ -274,8 +306,9 @@ module.exports = React.createClass({
         let lastShownEvent;
 
         let lastShownNonLocalEchoIndex = -1;
-        for (i = this.props.events.length-1; i >= 0; i--) {
-            const mxEv = this.props.events[i];
+        for (i = events.length-1; i >= 0; i--) {
+            const mxEv = events[i];
+
             if (!this._shouldShowEvent(mxEv)) {
                 continue;
             }
@@ -309,8 +342,8 @@ module.exports = React.createClass({
 
         const isMembershipChange = (e) => e.getType() === 'm.room.member';
 
-        for (i = 0; i < this.props.events.length; i++) {
-            const mxEv = this.props.events[i];
+        for (i = 0; i < events.length; i++) {
+            const mxEv = events[i];
             const eventId = mxEv.getId();
             const last = (mxEv === lastShownEvent);
 
@@ -330,7 +363,7 @@ module.exports = React.createClass({
                 // membership event, which will not change during forward pagination.
                 const key = "membereventlistsummary-" + (prevEvent ? mxEv.getId() : "initial");
 
-                if (this._wantsDateSeparator(prevEvent, mxEv.getDate())) {
+                if (this._wantsDateSeparator(prevEvent, mxEv.getDate()) && this.props.tileShape !== 'solicitation') {
                     const dateSeparator = <li key={ts1+'~'}><DateSeparator key={ts1+'~'} ts={ts1} /></li>;
                     ret.push(dateSeparator);
                 }
@@ -341,8 +374,8 @@ module.exports = React.createClass({
                 }
 
                 const summarisedEvents = [mxEv];
-                for (;i + 1 < this.props.events.length; i++) {
-                    const collapsedMxEv = this.props.events[i + 1];
+                for (;i + 1 < events.length; i++) {
+                    const collapsedMxEv = events[i + 1];
 
                     // Ignore redacted/hidden member events
                     if (!this._shouldShowEvent(collapsedMxEv)) {
@@ -471,20 +504,6 @@ module.exports = React.createClass({
             continuation = true;
         }
 
-/*
-        // Work out if this is still a continuation, as we are now showing commands
-        // and /me messages with their own little avatar. The case of a change of
-        // event type (commands) is handled above, but we need to handle the /me
-        // messages seperately as they have a msgtype of 'm.emote' but are classed
-        // as normal messages
-        if (prevEvent !== null && prevEvent.sender && mxEv.sender
-                && mxEv.sender.userId === prevEvent.sender.userId
-                && mxEv.getType() == prevEvent.getType()
-                && prevEvent.getContent().msgtype === 'm.emote') {
-            continuation = false;
-        }
-*/
-
         // local echoes have a fake date, which could even be yesterday. Treat them
         // as 'today' for the date separators.
         let ts1 = mxEv.getTs();
@@ -495,7 +514,7 @@ module.exports = React.createClass({
         }
 
         // do we need a date separator since the last event?
-        if (this._wantsDateSeparator(prevEvent, eventDate)) {
+        if (this._wantsDateSeparator(prevEvent, eventDate) && this.props.tileShape !== 'solicitation') {
             const dateSeparator = <li key={ts1}><DateSeparator key={ts1} ts={ts1} /></li>;
             ret.push(dateSeparator);
             continuation = false;

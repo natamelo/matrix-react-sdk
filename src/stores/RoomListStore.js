@@ -196,6 +196,10 @@ class RoomListStore extends Store {
                 this._roomUpdateTriggered(payload.event.getRoomId());
             }
             break;
+            case 'MatrixActions.Room.timelineUpdate': {
+                this._roomUpdateTriggered(payload.event.getRoomId());
+            }
+            break;
             // When an event is decrypted, it could mean we need to reorder the room
             // list because we now know the type of the event.
             case 'MatrixActions.Event.decrypted': {
