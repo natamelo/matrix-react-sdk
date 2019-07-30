@@ -406,10 +406,10 @@ module.exports = withMatrixClient(React.createClass({
         const isSubestacaoUser = userType === 'subestacao';
         const isPerturbacaoInterna = status === 'PERTURBACAO_INTERNA_INFORMADA';
 
-        var MessageContextMenu = null;
+        let MessageContextMenu = null;
         if (isSubestacaoUser && isPerturbacaoInterna) {
             MessageContextMenu = sdk.getComponent('context_menus.InternalDisturbanceContextMenu');
-        } else{
+        } else {
             MessageContextMenu = sdk.getComponent('context_menus.MessageContextMenu');
         }
 
@@ -842,7 +842,8 @@ module.exports = withMatrixClient(React.createClass({
 
                 let roomName;
 
-                if (content.status === 'Concluida' || content.status === 'Cancelada') {
+                if (content.status === 'Finalizado' || content.status === 'Concluida'
+                    || content.status === 'Cancelada') {
                     roomName =
                         <a className="mx_EventTile_noFocus" href={permalink} onClick={this.onPermalinkClicked}>
                             { text }
@@ -981,9 +982,9 @@ module.exports = withMatrixClient(React.createClass({
                     this.props.permalinkCreator,
                     'replyThread',
                 );
-                console.log(content.status);
                 if (content.status !== 'Solicitada') {checkButton = null;}
                 if (content.status !== 'Ciente') {finishButton = null;}
+
                 return (
                     <div className={classes}>
                         <div className="mx_EventTile_msgOption">
