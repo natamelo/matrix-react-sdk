@@ -275,7 +275,7 @@ module.exports = React.createClass({
         }
 
         for (const group of order) {
-            events = events.concat(group);
+            events = events.concat(group.reverse());
         }
 
         return events;
