@@ -1728,6 +1728,7 @@ module.exports = React.createClass({
             myMembership === 'join' && !this.state.searchResults
         );
         if (canSpeak) {
+            
             messageComposer =
                 <MessageComposer
                     groupId={this.props.groupId}

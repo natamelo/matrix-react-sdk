@@ -28,6 +28,7 @@ import Stickerpicker from './Stickerpicker';
 import { makeRoomPermalink } from '../../../matrix-to';
 import ContentMessages from '../../../ContentMessages';
 import classNames from 'classnames';
+import GroupStore from '../../../stores/GroupStore';
 
 import E2EIcon from './E2EIcon';
 import PredefinedMessage from './PredefinedMessage';
@@ -394,10 +395,20 @@ export default class MessageComposer extends React.Component {
 
     render() {
         var interventionButtons = null;
+        var groups = [];
+
+        if (this.props.room.roomId != null) {
+            groups = GroupStore.getGroupIdsForRoomId(this.props.room.roomId)
+        }
+                
+        var hasGroup = false;
+        if (groups.length > 0) {
+            hasGroup = groups[0].startsWith("+grupo_intervencao");
+        }
         
-        //if (this.props.groupId === 'grupo_intervencao') {
+        if (hasGroup) {
             interventionButtons = <PredefinedMessage key='predefinedmessage_controls_button' room={this.props.room} />;
-        //}
+        }    
     
         const controls = [
             this.state.me ? <ComposerAvatar key="controls_avatar" me={this.state.me} /> : null,
