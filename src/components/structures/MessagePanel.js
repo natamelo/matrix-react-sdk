@@ -278,7 +278,7 @@ module.exports = React.createClass({
             events = events.concat(group);
         }
 
-        return events.reverse();
+        return events;
     },
 
     _getEventTiles: function() {
@@ -766,6 +766,7 @@ module.exports = React.createClass({
                                  onFillRequest={this.props.onFillRequest}
                                  onUnfillRequest={this.props.onUnfillRequest}
                                  style={style}
+                                 tileShape={this.props.tileShape}
                                  stickyBottom={this.props.stickyBottom}
                                  resizeNotifier={this.props.resizeNotifier}>
                         { topSpinner }
@@ -775,6 +776,24 @@ module.exports = React.createClass({
                     </ScrollPanel>
                 </div>
             );
+        } else if (this.props.tileShape === 'solicitation') {
+            return (
+                <ScrollPanel ref="scrollPanel" className={className}
+                             onScroll={this.props.onScroll}
+                             onResize={this.onResize}
+                             onFillRequest={this.props.onFillRequest}
+                             onUnfillRequest={this.props.onUnfillRequest}
+                             style={style}
+                             tileShape={this.props.tileShape}
+                             stickyBottom={false}
+                             startAtBottom={false}
+                             resizeNotifier={this.props.resizeNotifier}>
+                    { topSpinner }
+                    { this._getEventTiles() }
+                    { whoIsTyping }
+                    { bottomSpinner }
+                </ScrollPanel>
+            );
         } else {
             return (
                 <ScrollPanel ref="scrollPanel" className={className}
@@ -783,6 +802,7 @@ module.exports = React.createClass({
                              onFillRequest={this.props.onFillRequest}
                              onUnfillRequest={this.props.onUnfillRequest}
                              style={style}
+                             tileShape={this.props.tileShape}
                              stickyBottom={this.props.stickyBottom}
                              resizeNotifier={this.props.resizeNotifier}>
                     { topSpinner }

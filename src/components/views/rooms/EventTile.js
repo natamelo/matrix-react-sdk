@@ -615,8 +615,6 @@ module.exports = withMatrixClient(React.createClass({
         const isRedacted = isMessageEvent(this.props.mxEvent) && this.props.isRedacted;
         const isEncryptionFailure = this.props.mxEvent.isDecryptionFailure();
 
-        const add_EventTileClass = this.props.tileShape !== 'solicitation' || content.status === 'Solicitada' ? true : false;
-
         const classes = classNames({
             mx_EventTile: true,
             mx_EventTile_info: isInfoMessage,
@@ -724,10 +722,12 @@ module.exports = withMatrixClient(React.createClass({
         }
 
         let status = null;
-        if (content.status === 'Ciente' || content.status === 'Autorizada' || content.status === 'Concluida') {
-            status = <div className="mx_EventTile_Checked"> {content.status.toUpperCase()} </div>;
-        } else {
-            status = <div className="mx_EventTile_Requested"> {content.status.toUpperCase()} </div>;
+        if (content && content.status) {
+            if (content.status === 'Ciente' || content.status === 'Autorizada' || content.status === 'Concluida') {
+                status = <div className="mx_EventTile_Checked"> {content.status.toUpperCase()} </div>;
+            } else {
+                status = <div className="mx_EventTile_Requested"> {content.status.toUpperCase()} </div>;
+            }
         }
 
         const timestamp = this.props.mxEvent.getTs() ?
@@ -802,25 +802,49 @@ module.exports = withMatrixClient(React.createClass({
                 const date = new Date(this.props.mxEvent.getTs());
                 const text = (room ? room.name : '') + ' - ' + content.solicitation_goal;
 
-                const roomName =
-                    <div className="mx_eventTile_solicitation_title">
-                        <EmojiText element="b" href={permalink} onClick={this.onPermalinkClicked}>
+                let roomName;
+
+                if (content.status === 'Concluida' || content.status === 'Cancelada') {
+                    roomName =
+                        <a className="mx_EventTile_noFocus" href={permalink} onClick={this.onPermalinkClicked}>
                             { text }
-                        </EmojiText>
-                    </div>;
-                return (
-                    <div className="mx_EventTile_padding">
-                        <div className={classes}>
-                            { roomName }
-                            <div>
-                                <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
-                                    Iniciado em { this._getDateString(date) } às { timestamp } <br />
-                                    Status: { status }
-                                </a>
+                        </a>;
+
+                    return (
+                        <div className="mx_EventTile_padding">
+                            <div className={classes}>
+                                { roomName }
+                                <div>
+                                    <a className="mx_EventTile_noFocus" href={permalink} onClick={this.onPermalinkClicked} >
+                                        Iniciado em { this._getDateString(date) } às { timestamp } <br />
+                                        Status: { status }
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                );
+                    );
+                } else {
+                    roomName =
+                        <div className="mx_eventTile_solicitation_title">
+                            <EmojiText element="b" href={permalink} onClick={this.onPermalinkClicked}>
+                                { text }
+                            </EmojiText>
+                        </div>;
+
+                    return (
+                        <div className="mx_EventTile_padding">
+                            <div className={classes}>
+                                { roomName }
+                                <div>
+                                    <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
+                                        Iniciado em { this._getDateString(date) } às { timestamp } <br />
+                                        Status: { status }
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
             }
             case 'intervention': {
                 const EmojiText = sdk.getComponent('elements.EmojiText');
