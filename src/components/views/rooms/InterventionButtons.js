@@ -7,7 +7,7 @@ import MatrixClientPeg from "../../../MatrixClientPeg";
 
 const BUTTONS_Z_INDEX = 3500;
 
-export default class PredefinedMessage extends React.Component {
+export default class InterventionButtons extends React.Component {
 
     constructor(props) {
         super(props);

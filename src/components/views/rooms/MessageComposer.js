@@ -31,7 +31,8 @@ import classNames from 'classnames';
 import GroupStore from '../../../stores/GroupStore';
 
 import E2EIcon from './E2EIcon';
-import PredefinedMessage from './PredefinedMessage';
+import InterventionButtons from './InterventionButtons';
+import SupervisionButtons from './SupervisionButtons';
 
 const formatButtonList = [
     _td("bold"),
@@ -394,22 +395,24 @@ export default class MessageComposer extends React.Component {
     }
 
     render() {
-        var interventionButtons = null;
+        var messageButtons = null;
         var groups = [];
 
         if (this.props.room.roomId != null) {
             groups = GroupStore.getGroupIdsForRoomId(this.props.room.roomId)
         }
                 
-        var hasGroup = false;
         if (groups.length > 0) {
-            hasGroup = groups[0].startsWith("+grupo_intervencao");
+            var isInterventation = groups[0].startsWith("+grupo_intervencao");
+            var isSupervion = groups[0].startsWith("+grupo_supervisao");
+            
+            if (isInterventation) {
+                messageButtons = <InterventionButtons key='predefinedmessage_controls_button' room={this.props.room} />;
+            } else if (isSupervion) {
+                messageButtons = <SupervisionButtons key='predefinedmessage_controls_button' room={this.props.room} />;    
+            }
         }
-        
-        if (hasGroup) {
-            interventionButtons = <PredefinedMessage key='predefinedmessage_controls_button' room={this.props.room} />;
-        }    
-    
+            
         const controls = [
             this.state.me ? <ComposerAvatar key="controls_avatar" me={this.state.me} /> : null,
             this.props.e2eStatus ? <E2EIcon key="e2eIcon" status={this.props.e2eStatus} className="mx_MessageComposer_e2eIcon" /> : null,
@@ -434,7 +437,7 @@ export default class MessageComposer extends React.Component {
                     permalinkCreator={this.props.permalinkCreator} />,
                 showFormattingButton ? <FormattingButton key="controls_formatting"
                     showFormatting={this.state.showFormatting} onClickHandler={this.onToggleFormattingClicked} /> : null,
-                interventionButtons,
+                messageButtons,
                 <Stickerpicker key='stickerpicker_controls_button' room={this.props.room} />,
                 <UploadButton key="controls_upload" roomId={this.props.room.roomId} />,
                 callInProgress ? <HangupButton key="controls_hangup" roomId={this.props.room.roomId} /> : null,

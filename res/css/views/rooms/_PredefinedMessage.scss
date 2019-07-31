@@ -88,3 +88,35 @@
     background-color:#c7c6c5;
     cursor: default;
 }
+
+.mx_PredefinedMessages_SupervisionButton {
+    position: absolute;
+    display: inline-block;
+    cursor: pointer;
+    left: 10px;
+    padding: 5px;
+    width: 200px;
+    height: 20px;
+    border-radius: 5px;
+    color: #FFFFFF;
+    text-align:center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mx_SupervisionButton_1 {
+    top: 6px;
+    background-color:#b36403;
+}
+
+.mx_SupervisionButton_2 {
+    top: 40px;
+    background-color:#0370b3;
+}
+
+.mx_SupervisionButton_3 {
+    top: 76px;
+    background-color:#03b381;
+}
