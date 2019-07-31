@@ -41,29 +41,25 @@ export default function shouldHideEvent(ev) {
     // Wrap getValue() for readability. Calling the SettingsStore can be
     // fairly resource heavy, so the checks below should avoid hitting it
     // where possible.
-    // console.log(">> start: " + ev.getContent().body);
+
+    //Esconder eventos informações entrou/saiu da sala
+    console.log('passou: ' + ev.getContent());
+    if (!ev.getContent().msgtype) {
+        return true;
+    }
+    
     const isEnabled = (name) => SettingsStore.getValue(name, ev.getRoomId());
-    // console.log(">> 1: " + ev.getContent().body);
+
     // Hide redacted events
     if (ev.isRedacted() && !isEnabled('showRedactions')) return true;
-    // console.log(">> 2: " + ev.getContent().body);
+
     const eventDiff = memberEventDiff(ev);
-    // console.log(">> 3: " + ev.getContent().body);
+
     if (eventDiff.isMemberEvent) {
         if ((eventDiff.isJoin || eventDiff.isPart) && !isEnabled('showJoinLeaves')) return true;
         if (eventDiff.isAvatarChange && !isEnabled('showAvatarChanges')) return true;
         if (eventDiff.isDisplaynameChange && !isEnabled('showDisplaynameChanges')) return true;
     }
-    // console.log(">> 4: " + ev.getContent().body);
-    //if (ev.getContent() != null && ev.getContent().body != null && 
-    //    ev.getContent().status != null) {
-    //    console.log("entrou: " + ev.getContent().status)
-    //}
-    //const isSolicitation = ev.getContent().body.includes("Solicitação");
-    //if (isSolicitation) {
-    //    return true;
-    //}
-    //console.log(">> " + ev.getContent().body);
-    //console.log(">> 5: " + ev.getContent().body);
+
     return false;
 }
