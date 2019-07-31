@@ -361,6 +361,32 @@ module.exports = withMatrixClient(React.createClass({
         });
     },
 
+
+    _finishSolicitation: function(event) {
+        const sendText = ContentHelpers.makeTextMessage;
+        const replyContent = ReplyThread.makeReplyMixIn(event);
+        const content = Object.assign(replyContent, sendText(_t("Finished")));
+
+        // Part of Replies fallback support - prepend the text we're sending
+        // with the text we're replying to
+        const nestedReply = ReplyThread.getNestedReplyText(event, this.props.permalinkCreator);
+        if (nestedReply) {
+            if (content.formatted_body) {
+                content.formatted_body = nestedReply.html + content.formatted_body;
+            }
+            content.body = nestedReply.body + content.body;
+        }
+
+        this.props.matrixClient.sendMessage(this.props.mxEvent.getRoomId(), content).then((res) => {
+            dis.dispatch({
+                action: 'message_sent',
+            });
+            this.forceUpdate();
+        }).catch((e) => {
+            onSendMessageFailed(e, this.props.room);
+        });
+    },
+
     shouldHighlight: function() {
         const actions = this.props.matrixClient.getPushActionsForEvent(this.props.mxEvent);
         if (!actions || !actions.tweaks) { return false; }
@@ -379,14 +405,14 @@ module.exports = withMatrixClient(React.createClass({
 
         const isSubestacaoUser = userType === 'subestacao';
         const isPerturbacaoInterna = status === 'PERTURBACAO_INTERNA_INFORMADA';
-        
-        var MessageContextMenu = null;
+
+        let MessageContextMenu = null;
         if (isSubestacaoUser && isPerturbacaoInterna) {
             MessageContextMenu = sdk.getComponent('context_menus.InternalDisturbanceContextMenu');
-        } else{
-            MessageContextMenu = sdk.getComponent('context_menus.MessageContextMenu');     
+        } else {
+            MessageContextMenu = sdk.getComponent('context_menus.MessageContextMenu');
         }
-        
+
         const buttonRect = e.target.getBoundingClientRect();
 
         // The window X and Y offsets are to adjust position when zoomed in to page
@@ -421,6 +447,10 @@ module.exports = withMatrixClient(React.createClass({
 
     onCancelClicked: function(e) {
         this._cancelSolicitation(this.props.mxEvent);
+    },
+
+    onFinishClicked: function(e) {
+        this._finishSolicitation(this.props.mxEvent);
     },
 
     toggleAllReadAvatars: function() {
@@ -701,6 +731,7 @@ module.exports = withMatrixClient(React.createClass({
         );
 
         let checkButton = null;
+        let finishButton = null;
 
         const isSolicitation = content && content.open_solicitation;
         const shouldShowInTimeLine = !this.props.tileShape || !this.props.tileShape.includes("solicitation");
@@ -708,6 +739,7 @@ module.exports = withMatrixClient(React.createClass({
         const isCteepUser = userType === 'cteep';
         const isOnsUser = userType === 'ons';
         const isSubestacaoUser = userType === 'subestacao';
+        const isUpdateSolicitation = content.action === 'update_solicitation';
 
         if (shouldShowInTimeLine && isSolicitation && isCteepUser) {
             checkButton = (
@@ -718,7 +750,13 @@ module.exports = withMatrixClient(React.createClass({
                 <span className="mx_EventTile_checkButton red" onClick={this.onCancelClicked}>  {_t("Cancel")} </span>
             );
         } else if (isSubestacaoUser) {
-            console.log(content);  
+            console.log(content);
+        }
+
+        if (shouldShowInTimeLine && isCteepUser && content && isUpdateSolicitation) {
+            finishButton = (
+                <span className="mx_EventTile_checkButton blue" onClick={this.onFinishClicked}>  {_t("Finished")} </span>
+            );
         }
 
         let status = null;
@@ -804,7 +842,8 @@ module.exports = withMatrixClient(React.createClass({
 
                 let roomName;
 
-                if (content.status === 'Concluida' || content.status === 'Cancelada') {
+                if (content.status === 'Finalizado' || content.status === 'Concluida'
+                    || content.status === 'Cancelada') {
                     roomName =
                         <a className="mx_EventTile_noFocus" href={permalink} onClick={this.onPermalinkClicked}>
                             { text }
@@ -944,6 +983,8 @@ module.exports = withMatrixClient(React.createClass({
                     'replyThread',
                 );
                 if (content.status !== 'Solicitada') {checkButton = null;}
+                if (content.status !== 'Ciente') {finishButton = null;}
+
                 return (
                     <div className={classes}>
                         <div className="mx_EventTile_msgOption">
@@ -965,6 +1006,7 @@ module.exports = withMatrixClient(React.createClass({
                             { keyRequestInfo }
                             { editButton }
                             { checkButton }
+                            { finishButton }
                         </div>
                         {
                             // The avatar goes after the event tile as it's absolutly positioned to be over the
