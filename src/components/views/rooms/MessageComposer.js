@@ -394,6 +394,14 @@ export default class MessageComposer extends React.Component {
         );
     }
 
+    getUserType() {
+        const userType = localStorage.getItem('mx_user_type');
+        if (userType === 'cteep') return 'CTEEP';
+        else if (userType === 'ons') return 'ONS';
+        else if (userType === 'subestacao') return 'SUBESTAÇÃO';
+        else return this.props.userType = "";
+    }
+
     render() {
         var messageButtons = null;
         var groups = [];
@@ -406,9 +414,11 @@ export default class MessageComposer extends React.Component {
             var isInterventation = groups[0].startsWith("+grupo_intervencao");
             var isSupervion = groups[0].startsWith("+grupo_supervisao");
             
+            var isUserONS = this.getUserType() == "ONS";
+            
             if (isInterventation) {
                 messageButtons = <InterventionButtons key='predefinedmessage_controls_button' room={this.props.room} />;
-            } else if (isSupervion) {
+            } else if (isSupervion && !isUserONS) {
                 messageButtons = <SupervisionButtons key='predefinedmessage_controls_button' room={this.props.room} />;    
             }
         }
