@@ -89,7 +89,7 @@ const MAX_READ_AVATARS = 5;
 
 module.exports = withMatrixClient(React.createClass({
     displayName: 'EventTile',
-
+    
     propTypes: {
         /* MatrixClient instance for sender verification etc */
         matrixClient: PropTypes.object.isRequired,
@@ -183,6 +183,9 @@ module.exports = withMatrixClient(React.createClass({
             verified: null,
             // Whether onRequestKeysClick has been called since mounting.
             previouslyRequestedKeys: false,
+
+            counter: null,
+
         };
     },
 
@@ -197,6 +200,8 @@ module.exports = withMatrixClient(React.createClass({
         this.props.matrixClient.on("deviceVerificationChanged",
                                  this.onDeviceVerificationChanged);
         this.props.mxEvent.on("Event.decrypted", this._onDecrypted);
+
+        setInterval(this.countDown, 1000);
     },
 
     componentWillReceiveProps: function(nextProps) {
@@ -218,6 +223,14 @@ module.exports = withMatrixClient(React.createClass({
         const client = this.props.matrixClient;
         client.removeListener("deviceVerificationChanged", this.onDeviceVerificationChanged);
         this.props.mxEvent.removeListener("Event.decrypted", this._onDecrypted);
+    },
+
+    countDown: function() {
+        if (this.state.counter > 0) {
+            this.setState({
+                counter: this.state.counter - 1,
+            });
+        }
     },
 
     /** called when the event is decrypted after we show it.
@@ -612,6 +625,7 @@ module.exports = withMatrixClient(React.createClass({
     },
 
     render: function() {
+
         const MessageTimestamp = sdk.getComponent('messages.MessageTimestamp');
         const SenderProfile = sdk.getComponent('messages.SenderProfile');
         const MemberAvatar = sdk.getComponent('avatars.MemberAvatar');
@@ -840,6 +854,34 @@ module.exports = withMatrixClient(React.createClass({
                 const date = new Date(this.props.mxEvent.getTs());
                 const text = (room ? room.name : '') + ' - ' + content.solicitation_goal;
 
+                var currentMilliSeconds = new Date().getTime();
+                var eventDateMilliSeconds = date.getTime();
+                var seconds = ((currentMilliSeconds - eventDateMilliSeconds) / 1000);
+
+                var limit = (5 * 60);
+
+                if (this.state.counter == null && seconds > 0) {
+                    this.setState({
+                        counter: Math.floor(limit - seconds),
+                    });
+                }
+
+                var min = 0;
+                var sec = 0;
+
+                var timeMessage = "";
+                if (content.status === 'Solicitada') {
+                    if (seconds <= limit) {
+                        min = Math.floor(this.state.counter / 60);
+                        sec = this.state.counter - (min * 60);
+                        timeMessage = <span>Enviada há {min} min e {sec} seg</span>;
+                    } else {
+                        timeMessage = <span className="mx_EventTile_red">Enviada há mais de 5 min!</span>;
+                    }
+                } else {
+                    timeMessage = <span>Iniciado em { this._getDateString(date) } às { timestamp }</span>;
+                }
+
                 let roomName;
 
                 if (content.status === 'Finalizado' || content.status === 'Concluida'
@@ -855,7 +897,7 @@ module.exports = withMatrixClient(React.createClass({
                                 { roomName }
                                 <div>
                                     <a className="mx_EventTile_noFocus" href={permalink} onClick={this.onPermalinkClicked} >
-                                        Iniciado em { this._getDateString(date) } às { timestamp } <br />
+                                        {timeMessage} <br></br>
                                         Status: { status }
                                     </a>
                                 </div>
@@ -876,7 +918,7 @@ module.exports = withMatrixClient(React.createClass({
                                 { roomName }
                                 <div>
                                     <a className="mx_EventTile_noDecoration" href={permalink} onClick={this.onPermalinkClicked} >
-                                        Iniciado em { this._getDateString(date) } às { timestamp } <br />
+                                        {timeMessage} <br></br>
                                         Status: { status }
                                     </a>
                                 </div>
