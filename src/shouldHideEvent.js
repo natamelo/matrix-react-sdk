@@ -43,7 +43,6 @@ export default function shouldHideEvent(ev) {
     // where possible.
 
     //Esconder eventos informações entrou/saiu da sala
-    console.log('passou: ' + ev.getContent());
     if (!ev.getContent().msgtype) {
         return true;
     }
