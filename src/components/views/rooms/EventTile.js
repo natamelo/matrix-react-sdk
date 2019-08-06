@@ -89,7 +89,7 @@ const MAX_READ_AVATARS = 5;
 
 module.exports = withMatrixClient(React.createClass({
     displayName: 'EventTile',
-    
+
     propTypes: {
         /* MatrixClient instance for sender verification etc */
         matrixClient: PropTypes.object.isRequired,
@@ -369,6 +369,7 @@ module.exports = withMatrixClient(React.createClass({
             dis.dispatch({
                 action: 'message_sent',
             });
+            this.forceUpdate();
         }).catch((e) => {
             onSendMessageFailed(e, this.props.room);
         });
