@@ -313,7 +313,8 @@ module.exports = withMatrixClient(React.createClass({
                 if (rA && rB && rA.event && rB.event &&
                     rA.event.content && rB.event.content &&
                     (rB.event.content.status === 'Ciente' ||
-                     rB.event.content.status === 'Cancelada')) {
+                     rB.event.content.status === 'Cancelada' ||
+                     rB.event.content.status === 'Finalizado')) {
                     return false;
                 }
             } else {

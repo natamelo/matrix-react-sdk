@@ -256,6 +256,50 @@ module.exports = React.createClass({
         return !shouldHideEvent(mxEv);
     },
 
+    _getEventStatusPriority: function(status) {
+        if (status === 'Solicitada') {
+            return 1;
+        } else if (status === 'Ciente' || status === 'Cancelada') {
+            return 2;
+        } else if (status === 'Finalizado') {
+            return 3;
+        } else {
+            return 0;
+        }
+    },
+
+    _checkEventsStatus: function(pEvents) {
+        let events = new Map();
+
+        for (let i = pEvents.length -1; i >= 0; i--) {
+            if (pEvents[i].getContent() && pEvents[i].getContent().status) {
+                if (events[pEvents[i].getContent().solicitation_number]) {
+                    const atualStatus = pEvents[i].getContent().status;
+                    const status = events[pEvents[i].getContent().solicitation_number];
+                    if (this._getEventStatusPriority(atualStatus) > this._getEventStatusPriority(status)) {
+                        events[pEvents[i].getContent().solicitation_number] =
+                            pEvents[i].getContent().status;
+                    }
+                } else {
+                    events[pEvents[i].getContent().solicitation_number] =
+                        pEvents[i].getContent().status;
+                }
+            }
+        }
+
+        for (let i = pEvents.length -1; i >= 0; i--) {
+            if (pEvents[i].getContent() && pEvents[i].getContent().status) {
+                const atualStatus = pEvents[i].getContent().status;
+                const status = events[pEvents[i].getContent().solicitation_number];
+                if (atualStatus !== status) {
+                    pEvents[i].getContent().status = status;
+                }
+            }
+        }
+
+        return pEvents;
+    },
+
     _getSortedSolicitations: function() {
         const order = [[], [], []];
         let events = [];
@@ -291,6 +335,8 @@ module.exports = React.createClass({
         } else {
             events = this.props.events;
         }
+
+        events = this._checkEventsStatus(events);
 
         this.eventNodes = {};
 
